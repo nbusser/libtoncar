@@ -1,3 +1,5 @@
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+
 _BASE_URLS = [
     "https://downloads.devkitpro.org/packages/",
 ]
@@ -64,4 +66,13 @@ devkitarm_repository = repository_rule(
             default = Label("@//platform:devkitarm.bazel"),
         ),
     },
+)
+
+def _devkitarm_ext_impl(ctx):
+    devkitarm_repository(
+        name = "devkitarm",
+    )
+
+devkitarm_ext = module_extension(
+    implementation = _devkitarm_ext_impl,
 )

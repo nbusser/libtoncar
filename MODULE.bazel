@@ -1,0 +1,83 @@
+module(
+    name = "gba_example",
+    version = "0.0.1",
+)
+
+# --------------------------------------------------------------------------------------------------
+# MARK: BCR Dependencies
+#
+# These dependencies come from the Bazel Central Registry (aka BCR, https://registry.bazel.build),
+# or from overrides below.
+
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "rules_cc", version = "0.2.17")
+bazel_dep(name = "rules_go", version = "0.60.0")
+
+# --------------------------------------------------------------------------------------------------
+# MARK: Toolchains
+
+register_toolchains(
+    "//platform:toolchain",
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+new_local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
+
+new_git_repository = use_repo_rule("@bazel//tools/build_defs/repo:git.bzl", "new_git_repository")
+
+# --------------------------------------------------------------------------------------------------
+# MARK: devkitARM
+
+devkitarm = use_extension("//platform:repo.bzl", "devkitarm_ext")
+use_repo(devkitarm, "devkitarm")
+
+# Gets 403 forbidden because the server requests user agents which cannot be injected through bazel.
+# We thus use new_local_repository instead.
+# http_archive(
+#     name = "devkitarm_crtls",
+#     build_file = "@//platform:devkitarm_crtls.bazel",
+#     headers = {
+#         "User-Agent": "Mozilla/5.0",
+#     },
+#     sha256 = "cdc159e16a931c173202b9a774c80af6a2c4d32c03dc3e7821eb183c7082b389",
+#     strip_prefix = "opt/devkitpro/devkitARM/arm-none-eabi/lib",
+#     urls = devkitarm_urls("devkitarm-crtls-1.1.1-1-any.pkg.tar.xz"),
+# )
+# Requires user to run ./setup.bash beforehand
+# TODO: upgrade to 1.4.5
+new_local_repository(
+    name = "devkitarm_crtls",
+    build_file = "@//platform:devkitarm_crtls.bazel",
+    path = "deps/installed/devkitarm-crtls",
+)
+
+# Gets 403 forbidden because the server requests user agents which cannot be injected through bazel.
+# We thus use new_local_repository instead.
+# http_archive(
+#     name = "libgba",
+#     build_file = "@//platform:libgba.bazel",
+#     sha256 = "ca806fce93e4f80d55577fa7a7cd34b12fa2934aee6a855d306c311c9cc2c876",
+#     strip_prefix = "opt/devkitpro/libgba",
+#     urls = devkitarm_urls("libgba-0.5.2-2-any.pkg.tar.xz"),
+# )
+# Requires user to run ./setup.bash beforehand
+# TODO: upgrade to 1.4.5
+new_local_repository(
+    name = "libgba",
+    build_file = "@//platform:libgba.bazel",
+    path = "deps/installed/libgba",
+)
+
+#
+# MARK: libtonc
+
+# TODO: get release 1.4.5
+new_git_repository(
+    name = "libtonc",
+    build_file = "@//platform:libtonc.bazel",
+    commit = "ccc03fa321e56f51aed5e2ee1d6e3df3d1cbc803",
+    remote = "https://github.com/devkitPro/libtonc.git",
+    shallow_since = "1598408685 +0100",
+)

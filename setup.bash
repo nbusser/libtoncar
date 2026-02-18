@@ -7,7 +7,7 @@ mkdir installed
 
 tmpdir=$(mktemp -d)
 tar -xf tarballs/devkitarm-crtls-1.1.1-1-any.pkg.tar.xz -C "$tmpdir" >/dev/null
-mv "$tmpdir/opt/devkitpro/devkitARM/arm-none-eabi/lib" installed/devkitarm
+mv "$tmpdir/opt/devkitpro/devkitARM/arm-none-eabi/lib" installed/devkitarm-crtls
 rm -rf "$tmpdir"
 
 tmpdir=$(mktemp -d)

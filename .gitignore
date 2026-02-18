@@ -1,3 +1,4 @@
 /bazel-*
 /.bazelrc.user
 deps/installed
+**/.DS_Store
