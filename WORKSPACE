@@ -54,12 +54,20 @@ new_git_repository(
     shallow_since = "1598408685 +0100",
 )
 
-http_archive(
+# Gets 403 forbidden because the server requests user agents
+# which cannot be injected through bazel.
+# http_archive(
+#     name = "libgba",
+#     build_file = "@//platform:libgba.bazel",
+#     sha256 = "ca806fce93e4f80d55577fa7a7cd34b12fa2934aee6a855d306c311c9cc2c876",
+#     strip_prefix = "opt/devkitpro/libgba",
+#     urls = devkitarm_urls("libgba-0.5.2-2-any.pkg.tar.xz"),
+# )
+# Requires user to run ./setup.bash beforehand
+new_local_repository(
     name = "libgba",
     build_file = "@//platform:libgba.bazel",
-    sha256 = "ca806fce93e4f80d55577fa7a7cd34b12fa2934aee6a855d306c311c9cc2c876",
-    strip_prefix = "opt/devkitpro/libgba",
-    urls = devkitarm_urls("libgba-0.5.2-2-any.pkg.tar.xz"),
+    path = "deps/installed/libgba",
 )
 
 register_toolchains(
@@ -72,10 +80,10 @@ register_toolchains(
 
 http_archive(
     name = "io_bazel_rules_go",
-    sha256 = "16e9fca53ed6bd4ff4ad76facc9b7b651a89db1689a2877d6fd7b82aa824e366",
+    sha256 = "67b4d1f517ba73e0a92eb2f57d821f2ddc21f5bc2bd7a231573f11bd8758192e",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.34.0/rules_go-v0.34.0.zip",
-        "https://github.com/bazelbuild/rules_go/releases/download/v0.34.0/rules_go-v0.34.0.zip",
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.50.0/rules_go-v0.50.0.zip",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.50.0/rules_go-v0.50.0.zip",
     ],
 )
 
