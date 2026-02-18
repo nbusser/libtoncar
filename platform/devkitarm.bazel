@@ -1,6 +1,6 @@
-load("@rules_cc//cc:defs.bzl", "cc_toolchain")
 load("@//platform:cc_toolchain_config.bzl", "cc_toolchain_config")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("@rules_cc//cc:defs.bzl", "cc_toolchain")
 
 package(default_visibility = ["//visibility:public"])
 

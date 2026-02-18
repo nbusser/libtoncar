@@ -3,22 +3,22 @@
 // the Mozilla Public License, version 2.0. See LICENSE.txt for details.
 
 #include <gba_console.h>
-#include <gba_video.h>
+#include <gba_input.h>
 #include <gba_interrupt.h>
 #include <gba_systemcalls.h>
-#include <gba_input.h>
+#include <gba_video.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
-    irqInit();
-	irqEnable(IRQ_VBLANK);
+  irqInit();
+  irqEnable(IRQ_VBLANK);
 
-	consoleDemoInit();
+  consoleDemoInit();
 
-	iprintf("\x1b[10;10HHello From Bazel!\n");
+  iprintf("\x1b[10;10HHello From Bazel!\n");
 
-	while (1) {
-		VBlankIntrWait();
-	}
+  while (1) {
+    VBlankIntrWait();
+  }
 }

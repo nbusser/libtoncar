@@ -19,19 +19,31 @@ bazel_skylib_workspace()
 # GBA Definitions
 # ==============================================================================
 
-load("//platform:repo.bzl", "devkitarm_repository", "devkitarm_urls")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+load("//platform:repo.bzl", "devkitarm_repository", "devkitarm_urls")
 
 devkitarm_repository(
     name = "devkitarm",
 )
 
-http_archive(
+# Gets 403 forbidden because the server requests user agents
+# which cannot be injected through bazel.
+# http_archive(
+#     name = "devkitarm_crtls",
+#     build_file = "@//platform:devkitarm_crtls.bazel",
+#     headers = {
+#         "User-Agent": "Mozilla/5.0",
+#     },
+#     sha256 = "cdc159e16a931c173202b9a774c80af6a2c4d32c03dc3e7821eb183c7082b389",
+#     strip_prefix = "opt/devkitpro/devkitARM/arm-none-eabi/lib",
+#     urls = devkitarm_urls("devkitarm-crtls-1.1.1-1-any.pkg.tar.xz"),
+# )
+
+# Requires user to run ./setup.bash beforehand
+new_local_repository(
     name = "devkitarm_crtls",
     build_file = "@//platform:devkitarm_crtls.bazel",
-    sha256 = "cdc159e16a931c173202b9a774c80af6a2c4d32c03dc3e7821eb183c7082b389",
-    strip_prefix = "opt/devkitpro/devkitARM/arm-none-eabi/lib",
-    urls = devkitarm_urls("devkitarm-crtls-1.1.1-1-any.pkg.tar.xz"),
+    path = "deps/installed/devkitarm",
 )
 
 new_git_repository(

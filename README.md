@@ -1,10 +1,10 @@
 # Bazel GBA Example
 
+Ripped off from https://github.com/depp/bazel-gba-example/tree/main.
+
 This is an example project for building a Game Boy Advance game with Bazel.
 
 ## Caution
-
-This downloads dependencies directly from the devKitPro package repository. Those packages will eventually be replaced with newer versions, and this repository will fail to build. At that point, you'll have to update this repo to a newer version of the packages.
 
 Bazel will cache the downloads locally and share them across different projects. However, please be kind. Do not build this project inside a CI environment without using your own cache. Here are some ways you can avoid relying on the devKitPro package servers:
 
@@ -13,6 +13,12 @@ Bazel will cache the downloads locally and share them across different projects.
 - If you have have a mirror of devKitPro, you can modify `_BASE_URLS` in [platform/repo.bzl](platform/repo.bzl) to point at the mirror.
 
 [bazel-proxy]: https://bazel.build/docs/external#using-proxies
+
+## Setup
+
+```shell
+./setup.bash
+```
 
 ## Building
 
