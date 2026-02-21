@@ -38,19 +38,15 @@ use_repo(devkitarm, "devkitarm")
 # http_archive(
 #     name = "devkitarm_crtls",
 #     build_file = "@//platform:devkitarm_crtls.bazel",
-#     headers = {
-#         "User-Agent": "Mozilla/5.0",
-#     },
-#     sha256 = "cdc159e16a931c173202b9a774c80af6a2c4d32c03dc3e7821eb183c7082b389",
+#     sha256 = "65faf10f62c219a1a8a3a182b0c4c56da7992599035ea32b3d79e39e79f964bb",
 #     strip_prefix = "opt/devkitpro/devkitARM/arm-none-eabi/lib",
-#     urls = devkitarm_urls("devkitarm-crtls-1.1.1-1-any.pkg.tar.xz"),
+#     urls = devkitarm_urls("devkitarm-crtls-1.2.6-1-any.pkg.tar.zst"),
 # )
 # Requires user to run ./setup.bash beforehand
-# TODO: upgrade to 1.4.5
 new_local_repository(
     name = "devkitarm_crtls",
     build_file = "@//platform:devkitarm_crtls.bazel",
-    path = "deps/installed/devkitarm-crtls",
+    path = "deps/installed/devkitarm-crtls-1.2.6-1",
 )
 
 # Gets 403 forbidden because the server requests user agents which cannot be injected through bazel.
