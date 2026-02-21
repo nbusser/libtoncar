@@ -11,6 +11,6 @@ mv "$tmpdir/opt/devkitpro/devkitARM/arm-none-eabi/lib" installed/devkitarm-crtls
 rm -rf "$tmpdir"
 
 tmpdir=$(mktemp -d)
-tar -xf tarballs/libgba-0.5.2-2-any.pkg.tar.xz -C "$tmpdir" >/dev/null
-mv "$tmpdir/opt/devkitpro/libgba" installed/libgba
+tar -xzf tarballs/libgba-0.5.4-1-any.pkg.tar.zst -C "$tmpdir" >/dev/null
+mv "$tmpdir/opt/devkitpro/libgba" installed/libgba-0.5.4-1
 rm -rf "$tmpdir"

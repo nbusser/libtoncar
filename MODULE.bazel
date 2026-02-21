@@ -54,16 +54,15 @@ new_local_repository(
 # http_archive(
 #     name = "libgba",
 #     build_file = "@//platform:libgba.bazel",
-#     sha256 = "ca806fce93e4f80d55577fa7a7cd34b12fa2934aee6a855d306c311c9cc2c876",
+#     sha256 = "64d2a274ea7c1a9f7705a75cf3b0b937678fb0b10c468eb6b37ce00e3fbb6125",
 #     strip_prefix = "opt/devkitpro/libgba",
-#     urls = devkitarm_urls("libgba-0.5.2-2-any.pkg.tar.xz"),
+#     urls = devkitarm_urls("libgba-0.5.4-1-any.pkg.tar.zst"),
 # )
 # Requires user to run ./setup.bash beforehand
-# TODO: upgrade to 1.4.5
 new_local_repository(
     name = "libgba",
     build_file = "@//platform:libgba.bazel",
-    path = "deps/installed/libgba",
+    path = "deps/installed/libgba-0.5.4-1",
 )
 
 #
