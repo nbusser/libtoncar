@@ -22,12 +22,8 @@ setup:
 build:
 	$(BAZEL) build --config=gba --config=strict "$(QUERY)"
 
-# Normally should use:
-# $(BAZEL) run generate_compile_commands -- "$(QUERY)"
-# But for some reason, I can't forward arguments to the binary.
 generate_commands:
-	$(BAZEL) build --config=host @wolfd_bazel_compile_commands//:generate_compile_commands
-	./bazel-bin/external/wolfd_bazel_compile_commands+/generate_compile_commands //src/...
+	$(BAZEL) run --config=host --config=strict //tools/generate_compile_commands -- "//src:game"
 
 build-dev: generate_commands build
 
