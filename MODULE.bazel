@@ -25,8 +25,6 @@ http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "ht
 
 new_local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
 
-new_git_repository = use_repo_rule("@bazel//tools/build_defs/repo:git.bzl", "new_git_repository")
-
 # --------------------------------------------------------------------------------------------------
 # MARK: devkitARM
 
@@ -65,14 +63,13 @@ new_local_repository(
     path = "deps/installed/libgba-0.5.4-1",
 )
 
-#
+# --------------------------------------------------------------------------------------------------
 # MARK: libtonc
 
-# TODO: get release 1.4.5
-new_git_repository(
+http_archive(
     name = "libtonc",
     build_file = "@//platform:libtonc.bazel",
-    commit = "ccc03fa321e56f51aed5e2ee1d6e3df3d1cbc803",
-    remote = "https://github.com/devkitPro/libtonc.git",
-    shallow_since = "1598408685 +0100",
+    sha256 = "d326c1b2b982f1375ff8c9118f463e75af8fccdd23916d7e98b1a3bbfbcffac0",
+    strip_prefix = "libtonc-1.4.5",
+    urls = ["https://github.com/devkitPro/libtonc/archive/refs/tags/v1.4.5.tar.gz"],
 )
