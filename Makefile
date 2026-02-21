@@ -1,4 +1,4 @@
-.PHONY: setup build generate_commands build-dev run clean
+.PHONY: setup build generate_commands build-dev run clean super-clean
 
 BAZEL = bazel
 QUERY = //src:game
@@ -20,7 +20,7 @@ setup:
 	rm -rf "$$tmpdir"
 
 build:
-	$(BAZEL) build --config=gba "$(QUERY)"
+	$(BAZEL) build --config=gba --config=strict "$(QUERY)"
 
 # Normally should use:
 # $(BAZEL) run generate_compile_commands -- "$(QUERY)"
@@ -29,7 +29,7 @@ generate_commands:
 	$(BAZEL) build --config=host @wolfd_bazel_compile_commands//:generate_compile_commands
 	./bazel-bin/external/wolfd_bazel_compile_commands+/generate_compile_commands //src/...
 
-build-dev: build generate_commands
+build-dev: generate_commands build
 
 # TODO: build mgba via bazel
 run:
@@ -37,3 +37,8 @@ run:
 
 clean:
 	$(BAZEL) clean
+	rm compile_commands.json
+
+super-clean:
+	$(BAZEL) clean --expunge
+	rm compile_commands.json
