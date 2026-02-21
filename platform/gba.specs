@@ -1,7 +1,7 @@
 %rename link old_link
 
 *link:
-%(old_link) -T external/+_repo_rules+devkitarm_crtls/gba_cart.ld
+%(old_link) -T external/+_repo_rules2+devkitarm_crtls/gba_cart.ld
 
 *startfile:
-external/+_repo_rules+devkitarm_crtls/thumb/gba_crt0%O crti%O%s crtbegin%O%s
+external/+_repo_rules2+devkitarm_crtls/thumb/gba_crt0%O crti%O%s crtbegin%O%s

@@ -14,6 +14,8 @@ bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_cc", version = "0.2.17")
 bazel_dep(name = "rules_go", version = "0.60.0")
 
+bazel_dep(name = "wolfd_bazel_compile_commands", version = "0.5.2", dev_dependency = True)
+
 # --------------------------------------------------------------------------------------------------
 # MARK: Toolchains
 
@@ -40,7 +42,7 @@ use_repo(devkitarm, "devkitarm")
 #     strip_prefix = "opt/devkitpro/devkitARM/arm-none-eabi/lib",
 #     urls = devkitarm_urls("devkitarm-crtls-1.2.6-1-any.pkg.tar.zst"),
 # )
-# Requires user to run ./setup.bash beforehand
+# Requires user to run `make setup` beforehand
 new_local_repository(
     name = "devkitarm_crtls",
     build_file = "@//platform:devkitarm_crtls.bazel",
@@ -56,7 +58,7 @@ new_local_repository(
 #     strip_prefix = "opt/devkitpro/libgba",
 #     urls = devkitarm_urls("libgba-0.5.4-1-any.pkg.tar.zst"),
 # )
-# Requires user to run ./setup.bash beforehand
+# Requires user to run `make setup` beforehand
 new_local_repository(
     name = "libgba",
     build_file = "@//platform:libgba.bazel",

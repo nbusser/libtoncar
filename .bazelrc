@@ -1,9 +1,18 @@
-build --incompatible_enable_cc_toolchain_resolution
-
 build --compilation_mode=opt
-build --platforms=//platform:gba
 
-build --copt=-fdiagnostics-color
-build --host_copt=-fdiagnostics-color
+build:gba --platforms=//platform:gba
+build:gba --copt=-fdiagnostics-color
+build:gba --host_copt=-fdiagnostics-color
+build:gba --incompatible_enable_cc_toolchain_resolution
+
+build:host --platforms=@platforms//host
+run:host --platforms=@platforms//host
 
 try-import %workspace%/.bazelrc.user
+
+# https://blog.aspect.build/bazelrc-flags
+build --experimental_reuse_sandbox_directories
+build --nolegacy_external_runfiles
+build --sandbox_default_allow_network=false
+test --build_tests_only
+test --test_verbose_timeout_warnings

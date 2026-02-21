@@ -2,3 +2,5 @@
 /.bazelrc.user
 deps/installed
 **/.DS_Store
+compile_commands.json
+external

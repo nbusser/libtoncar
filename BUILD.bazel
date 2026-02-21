@@ -1,1 +1,5 @@
-# TODO: add compile commands
+# bazel run generate_compile_commands -- "//..."
+alias(
+    name = "generate_compile_commands",
+    actual = "@wolfd_bazel_compile_commands//:generate_compile_commands",
+)
