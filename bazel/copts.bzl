@@ -17,25 +17,23 @@ COPTS_BASE = [
 
 _COPTS_WARNING = [
     "-Wall",
-    "-Wextra",
-    "-Wpointer-arith",
-    "-Wwrite-strings",
-    "-Wmissing-prototypes",
     "-Wdouble-promotion",
     "-Werror=implicit-function-declaration",
+    "-Wextra",
     "-Winit-self",
-    "-Wstrict-prototypes",
+    "-Wmissing-prototypes",
     "-Wno-format-zero-length",
+    "-Wstrict-prototypes",
+    "-Wpointer-arith",
+    "-Wwrite-strings",
 ]
 
-# Internal C compilation options. Use this by default for all C targets in the
-# repo.
+# Internal C compilation options. Use this by default for all C targets in the repo.
 COPTS = (
     COPTS_BASE +
     select({
-        "//bazel:warnings_off": [],
-        "//bazel:warnings_on": _COPTS_WARNING,
-        "//bazel:warnings_error": _COPTS_WARNING + ["-Werror"],
+        "//bazel:strict_false": _COPTS_WARNING,
+        "//bazel:strict_true": _COPTS_WARNING + ["-Werror"],
     })
 )
 
@@ -71,6 +69,6 @@ CXXOPTS = (
     CXXOPTS_BASE +
     select({
         "//bazel:strict_false": _CXXOPTS_WARNING,
-        "//bazel:strict_true": _CXXOPTS_WARNING + ["-Werror", "-Wunused-variable"],
+        "//bazel:strict_true": _CXXOPTS_WARNING + ["-Werror"],
     })
 )
