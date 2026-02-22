@@ -9,8 +9,6 @@ cc_binary(
     copts = CXXOPTS,
     linkopts = ["-specs=$(location @//platform:gba_specs)"],
     deps = [
-        # You should only keep one of these two guys.
-        "@libgba",
         "@libtonc",
     ],
 )
