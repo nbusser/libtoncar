@@ -16,4 +16,5 @@ cc_binary(
 gba_rom(
     name = "game",
     program = ":game.elf",
+    visibility = ["//tools/mgba:__pkg__"],
 )

@@ -2,8 +2,6 @@
 
 BAZEL = bazel
 QUERY = //src:game
-ROM = bazel-bin/src/game.gba
-MGBA = mgba
 
 DEPS_DIR := deps
 DEVKITARM_STAMP := $(DEPS_DIR)/installed/devkitarm-crtls-1.2.6-1/.stamp
@@ -26,6 +24,7 @@ $(LIBGBA_STAMP):
 	touch $(LIBGBA_STAMP)
 
 # Installs dependencies that cannot be fetched form bazel.
+# TODO: find a more bazel friendly solution to bypass the 403 error on tarball download.
 setup: $(DEVKITARM_STAMP) $(LIBGBA_STAMP)
 
 build: setup
@@ -37,12 +36,8 @@ compile_commands.json:
 
 build-dev: build compile_commands.json
 
-$(ROM):
-	$(MAKE) build
-
-# TODO: build mgba via bazel
-run: $(ROM)
-	$(MGBA) "$(ROM)"
+run: setup
+	$(BAZEL) run --config=gba --config=strict //tools/mgba:run_rom
 
 basic-clean:
 	rm -rf deps/installed

@@ -1,0 +1,7 @@
+# TODO: build mgba via bazel
+sh_binary(
+    name = "run_rom",
+    srcs = ["mgba_wrapper.sh"],
+    args = ["$(location //src:game)"],
+    data = ["//src:game"],
+)
