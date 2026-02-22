@@ -1,3 +1,6 @@
 CompileFlags:
   BuiltinHeaders: QueryDriver
+  # Not strictly necessary since it is already handled by query-driver.
   Compiler: external/+devkitarm_ext+devkitarm/bin/arm-none-eabi-gcc
+  Remove:
+    - -mthumb-interwork
