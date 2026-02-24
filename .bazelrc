@@ -1,4 +1,4 @@
-build --compilation_mode=opt
+build --compilation_mode=dbg
 
 build:gba --platforms=//platform:gba
 build:gba --copt=-fdiagnostics-color

@@ -1,0 +1,16 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//bazel:copts.bzl", "CXXOPTS")
+
+cc_library(
+    name = "libtoncar",
+    srcs = [
+        "toncar.cpp",
+    ],
+    hdrs = [
+        "registers.h",
+        "screen.h",
+        "toncar.h",
+    ],
+    copts = CXXOPTS,
+    visibility = ["//visibility:public"],
+)

@@ -1,9 +1,11 @@
 #include <stdlib.h>
 #include <tonc.h>
 
-#include "toncar.h"
+#include "libtoncar/registers.h"
+#include "libtoncar/screen.h"
+#include "libtoncar/toncar.h"
 
-using namespace libtoncar;
+using namespace toncar;
 
 int main(void) {
   Dispcnt::Reset()
