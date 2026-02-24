@@ -1,5 +1,6 @@
 #include "toncar.h"
 
+#include "colors.h"
 #include "registers.h"
 #include "screen.h"
 
@@ -11,7 +12,7 @@ void DeathTrap() {
   Dispcnt::Reset().SetMode(Dispcnt::Mode::DcntMode3).SetLayer(Dispcnt::Layer::DcntBg2);
   for (uint8_t i{0}; i < Screen::kHeight; ++i) {
     for (uint8_t j{0}; j < Screen::kWidth; ++j) {
-      Screen::WritePixel(j, i, Color15{31, 0, 0});
+      Screen::WritePixel(j, i, colors15::kRed);
     }
   }
   while (true) {
