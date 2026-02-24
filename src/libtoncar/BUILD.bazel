@@ -4,10 +4,11 @@ load("//bazel:copts.bzl", "CXXOPTS")
 cc_library(
     name = "libtoncar",
     srcs = [
-        "toncar.cpp",
+        "panic.cpp",
     ],
     hdrs = [
         "colors.h",
+        "panic.h",
         "registers.h",
         "screen.h",
         "toncar.h",

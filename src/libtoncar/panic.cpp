@@ -1,4 +1,4 @@
-#include "toncar.h"
+#include "panic.h"
 
 #include "colors.h"
 #include "registers.h"
@@ -8,11 +8,11 @@ namespace toncar {
 
 // TODO: include error message
 // TODO: disable on production mode
-void DeathTrap() {
+void Panic() {
   Dispcnt::Reset().SetMode(Dispcnt::Mode::DcntMode3).SetLayer(Dispcnt::Layer::DcntBg2);
   for (uint8_t i{0}; i < Screen::kHeight; ++i) {
     for (uint8_t j{0}; j < Screen::kWidth; ++j) {
-      Screen::WritePixel(j, i, colors15::kRed);
+      Screen::Mode3WritePixel(j, i, colors15::kRed);
     }
   }
   while (true) {
@@ -20,9 +20,9 @@ void DeathTrap() {
   }
 }
 
-void CheckOrDie(bool condition) {
+void CheckOrPanic(bool condition) {
   if (!condition) {
-    DeathTrap();
+    Panic();
   }
 }
 

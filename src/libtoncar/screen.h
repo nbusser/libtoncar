@@ -9,7 +9,7 @@ namespace toncar {
 
 class Screen : public Zone<Screen, uint16_t, memory::kVram> {
  public:
-  static Screen& WritePixel(uint8_t x, uint8_t y, Color15 color) {
+  static Screen& Mode3WritePixel(uint8_t x, uint8_t y, Color15 color) {
     return Set(y * kWidth + x, color.Value());
   }
 

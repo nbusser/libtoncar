@@ -6,13 +6,11 @@
 namespace toncar {
 
 namespace memory {
+
 inline constexpr uintptr_t kIo{0x04000000};
 inline constexpr uintptr_t kVram{0x06000000};
+
 }  // namespace memory
-
-void DeathTrap();
-
-void CheckOrDie(bool condition);
 
 template <typename Derived, typename T, uintptr_t addr>
 class Register {

@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "toncar.h"
+#include "panic.h"
 
 namespace toncar {
 
@@ -10,9 +10,9 @@ class Color15 {
  public:
   Color15(uint8_t red, uint8_t green, uint8_t blue)
       : value_{static_cast<uint16_t>(red | (green << 5) | (blue << 10))} {
-    CheckOrDie(red < 32);
-    CheckOrDie(green < 32);
-    CheckOrDie(blue < 32);
+    CheckOrPanic(red < 32);
+    CheckOrPanic(green < 32);
+    CheckOrPanic(blue < 32);
   }
 
   constexpr uint16_t Value() const { return value_; }
