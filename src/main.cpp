@@ -4,6 +4,7 @@
 #include "libtoncar/colors.h"
 #include "libtoncar/registers.h"
 #include "libtoncar/screen.h"
+#include "src/libtoncar/panic.h"
 
 using namespace toncar;
 

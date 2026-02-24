@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "src/libtoncar/panic.h"
+
 namespace toncar {
 
 namespace memory {
@@ -35,11 +37,12 @@ class Register {
   static volatile T& Ref() { return *reinterpret_cast<volatile T*>(addr); }
 };
 
-template <typename Derived, typename T, uintptr_t base_addr>
+template <typename Derived, typename T, uintptr_t base_addr, size_t size>
 class Zone {
  protected:
   static T Get(size_t offset) { return BaseAddress()[offset]; }
   static Derived& Set(size_t offset, T val) {
+    CheckOrPanic(offset < size);
     BaseAddress()[offset] = val;
     return Self();
   }

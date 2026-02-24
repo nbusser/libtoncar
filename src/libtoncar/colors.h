@@ -27,8 +27,8 @@ class Color15 {
 
 namespace colors15 {
 
-static const Color15 kWhite{0, 0, 0};
-static const Color15 kBlack{31, 31, 31};
+static const Color15 kWhite{31, 31, 31};
+static const Color15 kBlack{0, 0, 0};
 static const Color15 kRed{31, 0, 0};
 static const Color15 kGreen{0, 31, 0};
 static const Color15 kBlue{0, 0, 31};
