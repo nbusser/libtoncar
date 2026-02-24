@@ -1,6 +1,13 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//bazel:copts.bzl", "CXXOPTS")
 load("//platform:defs.bzl", "gba_rom")
+
+cc_library(
+    name = "gamelib",
+    srcs = [],
+    hdrs = ["toncar.h"],
+    copts = CXXOPTS,
+)
 
 cc_binary(
     name = "game.elf",
@@ -9,6 +16,7 @@ cc_binary(
     copts = CXXOPTS,
     linkopts = ["-specs=$(location @//platform:gba_specs)"],
     deps = [
+        "//src:gamelib",
         "@libtonc",
     ],
 )
