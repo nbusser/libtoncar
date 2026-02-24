@@ -9,10 +9,9 @@ int main(void) {
   Dispcnt::Reset()
       .Dispcnt::SetMode(Dispcnt::Mode::DcntMode3)
       .Dispcnt::SetLayer(Dispcnt::Layer::DcntBg2);
-
-  screen::Screen::WritePixel(120, 80, 0x001F)
-      .WritePixel(136, 80, 0x03E0)
-      .WritePixel(120, 96, 0x7C00);
+  Screen::WritePixel(120, 80, Color15{31, 0, 0})
+      .WritePixel(136, 80, Color15{0, 31, 0})
+      .WritePixel(120, 96, Color15{0, 0, 31});
 
   while (1) {
     VBlankIntrWait();

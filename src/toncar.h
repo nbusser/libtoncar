@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 
@@ -88,18 +89,33 @@ class Zone {
   static volatile T* BaseAddress() { return reinterpret_cast<volatile T*>(base_addr); }
 };
 
-namespace screen {
+class Color15 {
+ public:
+  constexpr Color15(uint8_t red, uint8_t green, uint8_t blue)
+      : value_{static_cast<uint16_t>(red | (green << 5) | (blue << 10))} {
+    assert(red < 32);
+    assert(green < 32);
+    assert(blue < 32);
+  }
+
+  constexpr uint16_t Value() const { return value_; }
+
+  constexpr uint8_t Red() const { return value_ & 31; }
+  constexpr uint8_t Green() const { return static_cast<uint8_t>((value_ >> 5) & 31); }
+  constexpr uint8_t Blue() const { return static_cast<uint8_t>((value_ >> 10) & 31); }
+
+ private:
+  const uint16_t value_;
+};
 
 class Screen : public Zone<Screen, uint16_t, memory::kVram> {
  public:
-  static Screen& WritePixel(uint8_t x, uint8_t y, uint16_t color) {
-    return Set(y * kWidth + x, color);
+  static Screen& WritePixel(uint8_t x, uint8_t y, Color15 color) {
+    return Set(y * kWidth + x, color.Value());
   }
 
   static constexpr uint32_t kWidth{240};
   static constexpr uint32_t kHeight{160};
 };
-
-}  // namespace screen
 
 }  // namespace libtoncar
