@@ -26,16 +26,16 @@ register_toolchains(
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-new_local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
-
 # --------------------------------------------------------------------------------------------------
 # MARK: devkitARM
 
 devkitarm = use_extension("//platform:repo.bzl", "devkitarm_ext")
 use_repo(devkitarm, "devkitarm")
 
+new_tarball_dependency = use_repo_rule("//deps/tarballs:new_tarball_dependency.bzl", "new_tarball_dependency")
+
 # Gets 403 forbidden because the server requests user agents which cannot be injected through bazel.
-# We thus use new_local_repository instead.
+# We thus use new_tarball_dependency instead.
 # http_archive(
 #     name = "devkitarm_crtls",
 #     build_file = "@//platform:devkitarm_crtls.bazel",
@@ -43,15 +43,15 @@ use_repo(devkitarm, "devkitarm")
 #     strip_prefix = "opt/devkitpro/devkitARM/arm-none-eabi/lib",
 #     urls = devkitarm_urls("devkitarm-crtls-1.2.6-1-any.pkg.tar.zst"),
 # )
-# Requires user to run `make setup` beforehand
-new_local_repository(
+new_tarball_dependency(
     name = "devkitarm_crtls",
-    build_file = "@//platform:devkitarm_crtls.bazel",
-    path = "deps/installed/devkitarm-crtls-1.2.6-1",
+    build_file = "//deps:devkitarm_crtls.bazel",
+    path = "//deps/tarballs:devkitarm-crtls-1.2.6-1-any.pkg.tar.zst",
+    strip_prefix = "opt/devkitpro/devkitARM/arm-none-eabi/lib",
 )
 
 # Gets 403 forbidden because the server requests user agents which cannot be injected through bazel.
-# We thus use new_local_repository instead.
+# We thus use new_tarball_dependency instead.
 # http_archive(
 #     name = "libgba",
 #     build_file = "@//platform:libgba.bazel",
@@ -59,11 +59,11 @@ new_local_repository(
 #     strip_prefix = "opt/devkitpro/libgba",
 #     urls = devkitarm_urls("libgba-0.5.4-1-any.pkg.tar.zst"),
 # )
-# Requires user to run `make setup` beforehand
-new_local_repository(
+new_tarball_dependency(
     name = "libgba",
-    build_file = "@//platform:libgba.bazel",
-    path = "deps/installed/libgba-0.5.4-1",
+    build_file = "//deps:libgba.bazel",
+    path = "//deps/tarballs:libgba-0.5.4-1-any.pkg.tar.zst",
+    strip_prefix = "opt/devkitpro/libgba",
 )
 
 # --------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ new_local_repository(
 
 http_archive(
     name = "libtonc",
-    build_file = "@//platform:libtonc.bazel",
+    build_file = "//deps:libtonc.bazel",
     sha256 = "d326c1b2b982f1375ff8c9118f463e75af8fccdd23916d7e98b1a3bbfbcffac0",
     strip_prefix = "libtonc-1.4.5",
     urls = ["https://github.com/devkitPro/libtonc/archive/refs/tags/v1.4.5.tar.gz"],

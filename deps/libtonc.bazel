@@ -1,0 +1,38 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "libtonc_asm",
+    srcs = glob(
+        ["**/*.s"],
+        exclude = ["src/tte/tte_types.s"],
+    ),
+    hdrs = [
+        "include/tonc_asminc.h",
+        "src/tte/tte_types.s",
+    ],
+    copts = [
+        "-x",
+        "assembler-with-cpp",
+        # Bazel's `includes` attribute generates correct -I flags for C compilation,
+        # but the C preprocessor resolves #include "..." relative to the source file
+        # when compiling assembly with -x assembler-with-cpp, so we need an explicit
+        # -I with an absolute path.
+        # The canonical repo name is an internal Bazel detail and may break if the repo
+        # is renamed or Bazel changes its naming scheme.
+        # Good enough for now
+        "-Iexternal/+_repo_rules+libtonc/include",
+    ],
+)
+
+cc_library(
+    name = "libtonc",
+    srcs = glob(["src/**/*.c"]),
+    hdrs = glob(["include/*.h"]),
+    includes = ["include"],
+    target_compatible_with = [
+        "@//platform:os",
+        "@//platform:arm7tdmi",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":libtonc_asm"],
+)
