@@ -144,8 +144,11 @@ cc_toolchain_config(
     cxx_flags = ["-std=c++23"],
 
     # Link flags.
+    # "-specs=.../gba.specs" must be given on cc_binary via linkopts.
+    # The reason is that gba.specs is generated via a genrule and must
+    # be located via a make variable, which is not available here.
+    # TODO: refactor to make this more convenient
     link_flags = [
-        "-specs=platform/gba.specs",
         "-Wl,-no-as-needed",
         "-pass-exit-codes",
     ],

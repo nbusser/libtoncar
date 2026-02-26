@@ -5,7 +5,9 @@ load("//platform:defs.bzl", "gba_rom")
 cc_binary(
     name = "game.elf",
     srcs = ["main.cpp"],
+    additional_linker_inputs = ["@//platform:gba_specs"],
     copts = CXXOPTS,
+    linkopts = ["-specs=$(location @//platform:gba_specs)"],
     deps = [
         # You should only keep one of these two guys.
         "@libgba",

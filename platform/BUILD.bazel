@@ -29,4 +29,33 @@ platform(
     ],
 )
 
-exports_files(["gba.specs"])
+genrule(
+    name = "gba_specs",
+    srcs = [
+        "@devkitarm_crtls//:gba_cart.ld",
+        "@devkitarm_crtls//:thumb/gba_crt0.o",
+    ],
+    outs = [
+        "gba.specs",
+    ],
+    cmd = """
+# no-sandbox: the genrule runs directly in Bazel's execroot, so $$pwd returns
+# the execroot. Since execpath returns a path relative to execroot, we end up
+# with an absolute path.
+execroot=$$(pwd)
+gba_cart_ld=$$execroot/$(execpath @devkitarm_crtls//:gba_cart.ld)
+gba_crt=$$execroot/$(execpath @devkitarm_crtls//:thumb/gba_crt0.o)
+
+cat <<EOF > $@
+%rename link old_link
+
+*link:
+%(old_link) -T $$gba_cart_ld
+
+*startfile:
+$$gba_crt crti%O%s crtbegin%O%s
+EOF""",
+    # Mandatory to write down absolute paths of gba_cart.ld and gba_crt0.o.
+    tags = ["no-sandbox"],
+    visibility = ["//visibility:public"],
+)
