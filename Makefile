@@ -1,9 +1,9 @@
 .PHONY: build compile_commands.json build-dev run lint basic-clean clean super-clean
 
-BAZEL = bazel
-QUERY = //src:game
-CLANG_TIDY= clang-tidy
-SOURCES := $(shell find src -name "*.cpp")
+BAZEL?=bazel
+QUERY?=//src:game
+CLANG_TIDY?=clang-tidy
+SOURCES:=$(shell find src -name "*.cpp")
 
 .clangd:
 	tools/clangd/gen_clangd.sh
