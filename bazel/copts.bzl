@@ -16,6 +16,10 @@ COPTS_BASE = [
 ]
 
 _COPTS_WARNING = [
+    "-fno-exceptions",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-rtti",
     "-Wall",
     "-Wdouble-promotion",
     "-Werror=implicit-function-declaration",
