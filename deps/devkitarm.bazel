@@ -82,6 +82,8 @@ filegroup(
     srcs = [
         ":gcc",
         ":ld",
+        # Not strictly necessary because of the linking
+        # step that must be manually added to cc_binary.
         "@//platform:gba.specs",
         "@devkitarm_crtls//:gba_cart.ld",
         "@devkitarm_crtls//:thumb/gba_crt0.o",

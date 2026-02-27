@@ -3,8 +3,6 @@
 BAZEL = bazel
 QUERY = //src:game
 
-DEPS_DIR := deps
-
 build:
 	$(BAZEL) build --config=gba --config=strict "$(QUERY)"
 
