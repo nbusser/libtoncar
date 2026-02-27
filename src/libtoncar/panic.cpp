@@ -1,5 +1,7 @@
 #include "panic.h"
 
+#include <cstdint>
+
 #include "colors.h"
 #include "registers.h"
 #include "screen.h"

@@ -3,14 +3,14 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "src/libtoncar/panic.h"
+#include "panic.h"
 
 namespace toncar {
 
 namespace memory {
 
-inline constexpr uintptr_t kIo{0x04000000};
-inline constexpr uintptr_t kVram{0x06000000};
+constexpr uintptr_t kIo{0x04000000};
+constexpr uintptr_t kVram{0x06000000};
 
 }  // namespace memory
 

@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "src/libtoncar/toncar.h"
+#include "toncar.h"
 
 namespace toncar {
 
@@ -31,11 +31,11 @@ class Dispcnt : public Register<Dispcnt, uint16_t, memory::kIo> {
 
   static Dispcnt& FlushLayers() { return And(0x0007); }
 
-  static bool HasLayer(Layer layer) { return GetAnd(static_cast<uint16_t>(layer)); }
+  static bool HasLayer(Layer layer) { return GetAnd(static_cast<uint16_t>(layer)) != 0U; }
 
   static Mode GetMode() { return static_cast<Mode>(GetAnd(0x0007)); }
   static Dispcnt& SetMode(Mode mode) {
-    return And(static_cast<uint16_t>(~0x0007)).Or(static_cast<uint16_t>(mode));
+    return And(static_cast<uint16_t>(~0x0007U)).Or(static_cast<uint16_t>(mode));
   }
 
   static Dispcnt& Reset() {

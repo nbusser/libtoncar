@@ -23,6 +23,9 @@ Checks: >
   -openmp-*,
   -zircon-*,
 
+  -bugprone-crtp-constructor-accessibility,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -cppcoreguidelines-pro-type-reinterpret-cast,
@@ -36,7 +39,11 @@ Checks: >
   -modernize-use-std-print,
   -performance-enum-size,
   -performance-no-int-to-ptr,
+  -readability-identifier-length,
   -readability-magic-numbers,
+  -readability-static-accessed-through-instance,
+  -performance-enum-size,
+  -performance-no-int-to-ptr,
 
 WarningsAsErrors: >
   *,
