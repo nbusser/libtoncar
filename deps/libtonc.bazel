@@ -13,12 +13,7 @@ cc_library(
     copts = [
         "-x",
         "assembler-with-cpp",
-        # Bazel's `includes` attribute generates correct -I flags for C compilation,
-        # but the C preprocessor resolves #include "..." relative to the source file
-        # when compiling assembly with -x assembler-with-cpp, so we need an explicit
-        # -I with an absolute path.
-        # The canonical repo name is an internal Bazel detail and may break if the repo
-        # is renamed or Bazel changes its naming scheme.
+        # Found no way to fix the include path. "includes = ["include"]" does not work...
         # Good enough for now
         # TODO: find stable solution
         "-Iexternal/+_repo_rules2+libtonc/include",
