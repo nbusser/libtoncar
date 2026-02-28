@@ -12,10 +12,10 @@ namespace toncar {
 // TODO: disable on production mode
 void Panic() {
   Dispcnt::Reset().SetMode(Dispcnt::Mode::DcntMode3).SetLayer(Dispcnt::Layer::DcntBg2);
-  for (uint8_t i{0}; i < Screen::kHeight; ++i) {
-    for (uint8_t j{0}; j < Screen::kWidth; ++j) {
-      Screen::Mode3WritePixel(j, i, colors15::kRed);
-    }
+  for (uint32_t i{0}; i < Screen::kHeight * Screen::kWidth; ++i) {
+    uint32_t row{i / Screen::kWidth};
+    uint32_t col{i % Screen::kWidth};
+    Screen::Mode3WritePixel(static_cast<uint8_t>(col), static_cast<uint8_t>(row), colors15::kRed);
   }
   while (true) {
     // Trap
