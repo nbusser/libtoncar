@@ -4,10 +4,12 @@ load("//bazel:copts.bzl", "CXXOPTS")
 cc_library(
     name = "libtoncar",
     srcs = [
+        "mgba/logger.cpp",
         "panic.cpp",
     ],
     hdrs = [
         "colors.h",
+        "mgba/logger.h",
         "panic.h",
         "registers/display.h",
         "registers/registers.h",

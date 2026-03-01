@@ -9,6 +9,7 @@
     "asminc",
     "autofdo",
     "bitcode",
+    "bugprone",
     "clif",
     "codegen",
     "crosstool",
@@ -22,6 +23,7 @@
     "depset",
     "devkitarm",
     "devkitpro",
+    "Dispcnt",
     "DNDEBUG",
     "eabi",
     "elif",
@@ -56,6 +58,7 @@
     "libgba",
     "libgcc",
     "libtonc",
+    "libtoncar",
     "linkopts",
     "linkstamp",
     "linkstamps",
@@ -81,6 +84,7 @@
     "thinlto",
     "threadsafe",
     "tonc",
+    "toncar",
     "unprofiled",
     "Wcast",
     "Wconversion",
@@ -103,5 +107,5 @@
     "Wunused",
     "Wwrite",
     "Xclang"
-  ]
+]
 }

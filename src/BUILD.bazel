@@ -10,7 +10,6 @@ cc_binary(
     linkopts = ["-specs=$(location @//platform:gba_specs)"],
     deps = [
         "//src/libtoncar",
-        "//src/mgba-debug",
         "@libtonc",
     ],
 )

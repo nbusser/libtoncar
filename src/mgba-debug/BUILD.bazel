@@ -7,7 +7,6 @@ cc_library(
         "gba_types.h",
         "mgba.h",
     ],
-    # copts = CXXOPTS,
     includes = ["."],
     visibility = ["//visibility:public"],
 )
