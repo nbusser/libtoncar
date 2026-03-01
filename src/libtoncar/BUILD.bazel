@@ -9,10 +9,12 @@ cc_library(
     hdrs = [
         "colors.h",
         "panic.h",
-        "registers.h",
+        "registers/display.h",
+        "registers/registers.h",
         "screen.h",
         "toncar.h",
     ],
     copts = CXXOPTS,
+    includes = ["."],
     visibility = ["//visibility:public"],
 )

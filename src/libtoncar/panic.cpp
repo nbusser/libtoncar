@@ -4,7 +4,7 @@
 #include <string_view>
 
 #include "colors.h"
-#include "registers.h"
+#include "registers/display.h"
 #include "screen.h"
 
 namespace toncar {

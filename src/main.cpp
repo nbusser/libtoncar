@@ -3,7 +3,7 @@
 #include <cstdlib>
 
 #include "libtoncar/colors.h"
-#include "libtoncar/registers.h"
+#include "libtoncar/registers/display.h"
 #include "libtoncar/screen.h"
 
 // NOLINTNEXTLINE(google-build-using-namespace)

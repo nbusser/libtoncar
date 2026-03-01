@@ -2,12 +2,15 @@
 
 #include <cstdint>
 
+#include "registers/registers.h"
 #include "toncar.h"
 
 namespace toncar {
 
+/// REG_DISPCNT: Display control register.
 class Dispcnt : public Register<Dispcnt, uint16_t, memory::kIo> {
  public:
+  /// Bits 0-2: DCNT_MODE
   enum class Mode : uint16_t {
     DcntMode0 = 0x0000,
     DcntMode1 = 0x0001,
@@ -17,6 +20,7 @@ class Dispcnt : public Register<Dispcnt, uint16_t, memory::kIo> {
     DcntMode5 = 0x0005
   };
 
+  /// Bits 8-12: DCNT_LAYER
   enum class Layer : uint16_t {
     DcntBg0 = 1 << 8,   // 0x0100
     DcntBg1 = 1 << 9,   // 0x0200
@@ -42,5 +46,4 @@ class Dispcnt : public Register<Dispcnt, uint16_t, memory::kIo> {
     return FlushLayers().SetMode(Mode::DcntMode0).SetLayer(Layer::DcntBg0);
   }
 };
-
 }  // namespace toncar
