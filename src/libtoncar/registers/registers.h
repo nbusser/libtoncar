@@ -4,7 +4,6 @@
 #include <panic.h>
 #include <toncar.h>
 
-#include <cassert>
 #include <concepts>
 #include <cstdint>
 
@@ -26,6 +25,7 @@ class Register : public RegisterBase<Derived, T, offset_from_io> {
 
  private:
   using Base = RegisterBase<Derived, T, offset_from_io>;
+  friend Base;
 };
 
 template <typename Derived,
@@ -58,11 +58,16 @@ class TransactionRegister : public RegisterBase<Derived, T, offset_from_io> {
 
  private:
   using Base = RegisterBase<Derived, T, offset_from_io>;
+  friend Base;
 
   T staged_value_;
   T last_commit_value_;
 };
 
+// The subclasses must define these methods:
+// Derived& Set(T /*val*/);
+// Derived& Or(T /*val*/);
+// Derived& And(T /*val*/);
 template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io>
 class RegisterBase {
   friend class Register<Derived, T, offset_from_io>;
@@ -75,48 +80,35 @@ class RegisterBase {
   }
 
  protected:
-  T Get() { return Ref(); }
+  [[nodiscard]] T Get() const { return CRef(); }
 
-  T GetOr(T val) { return Ref() | val; }
-  T GetAnd(T val) { return Ref() & val; }
+  [[nodiscard]] T GetOr(T val) const { return CRef() | val; }
+  [[nodiscard]] T GetAnd(T val) const { return CRef() & val; }
 
   template <uint8_t position>
-  bool HasBit() {
-    assert(position < sizeof(T) * 8);
+  [[nodiscard]] bool HasBit() const {
+    static_assert(position < sizeof(T) * 8);
     constexpr T kMask{T{1} << position};
     return (Get() & kMask) == kMask;
   }
 
-  Derived& Set(T /*val*/) {
-    GBA_ASSERT(false);
-    return static_cast<Derived&>(*this);
-  }
-
-  Derived& Or(T /*val*/) {
-    GBA_ASSERT(false);
-    return static_cast<Derived&>(*this);
-  }
-  Derived& And(T /*val*/) {
-    GBA_ASSERT(false);
-    return static_cast<Derived&>(*this);
-  }
-
   template <uint8_t position>
   Derived& SetBit() {
-    assert(position < sizeof(T) * 8);
+    static_assert(position < sizeof(T) * 8);
     constexpr T kMask{T{1} << position};
-    return Or(kMask);
+    return static_cast<Derived&>(*this).Or(kMask);
   }
 
   template <uint8_t position>
   Derived& ClearBit() {
-    assert(position < sizeof(T) * 8);
+    static_assert(position < sizeof(T) * 8);
     constexpr T kMask{~(T{1} << position)};
-    return And(kMask);
+    return static_cast<Derived&>(*this).And(kMask);
   }
 
  private:
   volatile T& Ref() { return *reinterpret_cast<volatile T*>(memory::kIo + offset_from_io); }
+  volatile T& CRef() const { return *reinterpret_cast<volatile T*>(memory::kIo + offset_from_io); }
 };
 
 }  // namespace toncar

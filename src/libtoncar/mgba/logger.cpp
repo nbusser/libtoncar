@@ -18,7 +18,7 @@ class MgbaDebugRegister : public Register<MgbaDebugRegister, uint16_t, 0x00FFF78
  public:
   MgbaDebugRegister& Enable() { return Set(0xC0DE); }
   MgbaDebugRegister& Disable() { return Set(0x0); }
-  bool IsEnabled() { return Get() == 0x1DEA; }
+  [[nodiscard]] bool IsEnabled() const { return Get() == 0x1DEA; }
 };
 
 class MgbaDebugFlagsRegister

@@ -17,6 +17,7 @@ int main() {
   Screen::Mode3WritePixel(120, 80, colors15::kRed)
       .Mode3WritePixel(136, 80, colors15::kGreen)
       .Mode3WritePixel(120, 96, colors15::kBlue);
+  DispStat::Instance().RequestHBlankInterrupt();
 
   while (true) {
     VBlankIntrWait();

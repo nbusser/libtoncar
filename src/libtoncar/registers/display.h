@@ -34,11 +34,13 @@ class Dispcnt : public Register<Dispcnt, uint16_t, 0x00> {
 
   Dispcnt& FlushLayers() { return And(0x0007); }
 
-  bool HasLayer(Layer layer) { return GetAnd(static_cast<uint16_t>(layer)) != 0U; }
+  [[nodiscard]] bool HasLayer(Layer layer) const {
+    return GetAnd(static_cast<uint16_t>(layer)) != 0U;
+  }
 
   Dispcnt& Reset() { return FlushLayers().SetMode(Mode::DcntMode0).SetLayer(Layer::DcntBg0); }
 
-  Mode GetMode() { return static_cast<Mode>(GetAnd(0x0007)); }
+  [[nodiscard]] Mode GetMode() const { return static_cast<Mode>(GetAnd(0x0007)); }
   Dispcnt& SetMode(Mode mode) {
     return And(static_cast<uint16_t>(~0x0007U)).Or(static_cast<uint16_t>(mode));
   }
@@ -48,11 +50,11 @@ class Dispcnt : public Register<Dispcnt, uint16_t, 0x00> {
 /// TODO: could be more generic, but we will not over-engineer yet.
 class DispStat : public Register<DispStat, uint16_t, 0x04> {
  public:
-  [[nodiscard]] bool IsInVBlank() { return HasBit<Fields::StatInVbl>(); }
+  [[nodiscard]] bool IsInVBlank() const { return HasBit<Fields::StatInVbl>(); }
 
-  [[nodiscard]] bool IsInHBlank() { return HasBit<Fields::StatInHbl>(); }
+  [[nodiscard]] bool IsInHBlank() const { return HasBit<Fields::StatInHbl>(); }
 
-  [[nodiscard]] bool IsVCountTrigger() { return HasBit<Fields::StatInVct>(); }
+  [[nodiscard]] bool IsVCountTrigger() const { return HasBit<Fields::StatInVct>(); }
 
   DispStat& RequestVBlankInterrupt() { return SetBit<Fields::StatVlcIrq>(); }
 
