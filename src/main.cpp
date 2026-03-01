@@ -15,7 +15,7 @@ int main() {
   Screen& screen = Screen::Instance();
   DispStat& dispstat = DispStat::Instance();
 
-  mgba::Logger::Log(mgba::Logger::Level::Info, "Start");
+  MGBA_LOG(mgba::Logger::Level::Info, "Start");
 
   dispcnt.Reset().SetMode(Dispcnt::Mode::DcntMode3).SetLayer(Dispcnt::Layer::DcntBg2);
   screen.Mode3WritePixel(120, 80, colors15::kRed)

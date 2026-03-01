@@ -6,7 +6,7 @@ namespace toncar {
 
 void Panic(std::string_view condition, std::string_view file, int32_t line);
 
-// NOLINTBEGIN(cppcoreguidelines-macro-usage
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #ifndef NDEBUG
 #define GBA_ASSERT(cond)                \
   do {                                  \
@@ -19,6 +19,6 @@ void Panic(std::string_view condition, std::string_view file, int32_t line);
   do { /* noop */        \
   } while (0)
 #endif
-// NOLINTEND(cppcoreguidelines-macro-usage
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 }  // namespace toncar
