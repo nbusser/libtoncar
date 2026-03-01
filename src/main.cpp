@@ -10,10 +10,22 @@
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace toncar;
 
+namespace {
+// Waiting for a proper VBlank synchronizer.
+void ManualVsync() {
+  // Wait until VDraw
+  while (VCount::Instance().Value() >= 160) {
+  }
+  // Wait until VBlank
+  while (VCount::Instance().Value() < 160) {
+  }
+}
+}  // namespace
+
 int main() {
   Dispcnt& dispcnt = Dispcnt::Instance();
   Screen& screen = Screen::Instance();
-  DispStat& dispstat = DispStat::Instance();
+  // DispStat& dispstat = DispStat::Instance();
 
   MGBA_LOG(mgba::Logger::Level::Info, "Start");
 
@@ -21,9 +33,8 @@ int main() {
   screen.Mode3WritePixel(120, 80, colors15::kRed)
       .Mode3WritePixel(136, 80, colors15::kGreen)
       .Mode3WritePixel(120, 96, colors15::kBlue);
-  dispstat.RequestHBlankInterrupt();
 
   while (true) {
-    VBlankIntrWait();
+    ManualVsync();
   }
 }
