@@ -21,11 +21,10 @@ class MgbaDebugRegister : Register<MgbaDebugRegister, uint16_t, 0x00FFF780> {
   static bool IsEnabled() { return Get() == 0x1DEA; }
 };
 
-class MgbaDebugFlagsRegister : Register<MgbaDebugFlagsRegister, uint16_t, 0x00FFF700> {
+class MgbaDebugFlagsRegister : TransactionRegister<MgbaDebugFlagsRegister, uint16_t, 0x00FFF700> {
  public:
   static void SetLevel(Logger::Level level) {
-    // TODO: implement a commit-based Register to use .Or(kMask) instead.
-    Set(static_cast<uint16_t>(level) | kMask);
+    Set(static_cast<uint16_t>(level)).Or(kMask).Commit();
   }
 
  private:

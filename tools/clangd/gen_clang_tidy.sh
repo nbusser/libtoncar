@@ -24,6 +24,7 @@ Checks: >
   -zircon-*,
 
   -bugprone-crtp-constructor-accessibility,
+  -bugprone-dynamic-static-initializers,
   -bugprone-easily-swappable-parameters,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-avoid-const-or-ref-data-members,

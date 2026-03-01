@@ -21,10 +21,7 @@ class Logger final {
  private:
   Logger();
 
-  static void EnsureInstanceExists() {
-    // NOLINTNEXTLINE(bugprone-dynamic-static-initializers): no multithreading
-    static Logger logger{};
-  }
+  static void EnsureInstanceExists() { static Logger logger{}; }
 
   const devoptab_t dotab_stdout_;
   const devoptab_t dotab_stderr_;
