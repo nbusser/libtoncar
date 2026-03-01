@@ -17,4 +17,5 @@ cc_library(
     copts = CXXOPTS,
     includes = ["."],
     visibility = ["//visibility:public"],
+    deps = ["//src/mgba-debug"],
 )

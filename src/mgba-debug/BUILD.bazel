@@ -1,0 +1,13 @@
+cc_library(
+    name = "mgba-debug",
+    srcs = [
+        "mgba.c",
+    ],
+    hdrs = [
+        "gba_types.h",
+        "mgba.h",
+    ],
+    # copts = CXXOPTS,
+    includes = ["."],
+    visibility = ["//visibility:public"],
+)
