@@ -47,20 +47,20 @@ class Dispcnt : public Register<Dispcnt, uint16_t, 0x00> {
 };
 
 /// REG_DISPSTAT: Display stat register.
-// TODO: find better API
+// TODO: could be more generic, but we will not over-engineer yet.
 class DispStat : Register<DispStat, uint16_t, 0x04> {
  public:
-  [[nodiscard]] static bool IsInVBlank() { return (Get() & 0b1) == 1; }
+  [[nodiscard]] static bool IsInVBlank() { return HasBit(0); }
 
-  [[nodiscard]] static bool IsInHBlank() { return ((Get() & 0b10) >> 1) == 1; }
+  [[nodiscard]] static bool IsInHBlank() { return HasBit(1); }
 
-  [[nodiscard]] static bool IsVCountTrigger() { return ((Get() & 0b100) >> 2) == 1; }
+  [[nodiscard]] static bool IsVCountTrigger() { return HasBit(2); }
 
-  static DispStat& RequestVBlankInterrupt() { return And(0b1000); }
+  static DispStat& RequestVBlankInterrupt() { return SetBit(3); }
 
-  static DispStat& RequestHBlankInterrupt() { return And(0b10000); }
+  static DispStat& RequestHBlankInterrupt() { return SetBit(4); }
 
-  static DispStat& RequestVCountInterrupt() { return And(0b100000); }
+  static DispStat& RequestVCountInterrupt() { return SetBit(5); }
 };
 
 }  // namespace toncar
