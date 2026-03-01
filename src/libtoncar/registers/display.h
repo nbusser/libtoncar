@@ -1,5 +1,7 @@
 #pragma once
 
+#include <panic.h>
+
 #include <cstdint>
 
 #include "registers/registers.h"
@@ -71,6 +73,17 @@ class DispStat : public Register<DispStat, uint16_t, 0x04> {
     StatHblIrq = 4,
     StatVctIrq = 5,
   };
+};
+
+/// REG_VCOUNT: Display vertical count register.
+class VCount : public Register<VCount, uint16_t, 0x06> {
+ public:
+  /// Gets the VCount value (between 0 and 227).
+  [[nodiscard]] uint16_t Value() const {
+    const uint16_t value{GetAnd(0x00FF)};
+    GBA_ASSERT(value < 228);
+    return value;
+  }
 };
 
 }  // namespace toncar
