@@ -42,7 +42,7 @@ class Zone {
  protected:
   static T Get(size_t offset) { return BaseAddress()[offset]; }
   static Derived& Set(size_t offset, T val) {
-    CheckOrPanic(offset < size);
+    GBA_ASSERT(offset < size);
     BaseAddress()[offset] = val;
     return Self();
   }

@@ -1,6 +1,7 @@
 #include "panic.h"
 
 #include <cstdint>
+#include <string_view>
 
 #include "colors.h"
 #include "registers.h"
@@ -10,7 +11,7 @@ namespace toncar {
 
 // TODO: include error message
 // TODO: disable on production mode
-void Panic() {
+void Panic(std::string_view /*condition*/, std::string_view /*file*/, int32_t /*line*/) {
   Dispcnt::Reset().SetMode(Dispcnt::Mode::DcntMode3).SetLayer(Dispcnt::Layer::DcntBg2);
   for (uint32_t i{0}; i < Screen::kHeight * Screen::kWidth; ++i) {
     uint32_t row{i / Screen::kWidth};
@@ -19,12 +20,6 @@ void Panic() {
   }
   while (true) {
     // Trap
-  }
-}
-
-void CheckOrPanic(bool condition) {
-  if (!condition) {
-    Panic();
   }
 }
 

@@ -10,9 +10,9 @@ class Color15 {
  public:
   Color15(uint8_t red, uint8_t green, uint8_t blue)
       : value_{static_cast<uint16_t>(red | (green << 5U) | (blue << 10U))} {
-    CheckOrPanic(red < 32U);
-    CheckOrPanic(green < 32U);
-    CheckOrPanic(blue < 32U);
+    GBA_ASSERT(red < 32U);
+    GBA_ASSERT(green < 32U);
+    GBA_ASSERT(blue < 32U);
   }
 
   [[nodiscard]] constexpr uint16_t Value() const { return value_; }
