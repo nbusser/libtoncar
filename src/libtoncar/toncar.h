@@ -16,9 +16,15 @@ constexpr uintptr_t kVram{0x06000000};
 
 template <typename Derived, typename T, uintptr_t base_addr, size_t size>
 class Zone {
+ public:
+  static Derived& Instance() {
+    static Derived instance{};
+    return instance;
+  }
+
  protected:
-  static T Get(size_t offset) { return BaseAddress()[offset]; }
-  static Derived& Set(size_t offset, T val) {
+  T Get(size_t offset) const { return BaseAddress()[offset]; }
+  Derived& Set(size_t offset, T val) {
     GBA_ASSERT(offset < size);
     BaseAddress()[offset] = val;
     return Self();
@@ -30,7 +36,7 @@ class Zone {
   }
 
  private:
-  static volatile T* BaseAddress() { return reinterpret_cast<volatile T*>(base_addr); }
+  volatile T* BaseAddress() const { return reinterpret_cast<volatile T*>(base_addr); }
 };
 
 }  // namespace toncar
