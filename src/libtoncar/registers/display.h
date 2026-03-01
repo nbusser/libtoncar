@@ -61,20 +61,22 @@ class Dispcnt : public Register<Dispcnt, uint16_t, 0x00> {
 /// TODO: could be more generic, but we will not over-engineer yet.
 class DispStat : public Register<DispStat, uint16_t, 0x04> {
  public:
-  [[nodiscard]] bool IsInVBlank() const { return HasBit<Fields::StatInVbl>(); }
+  [[nodiscard]] bool IsInVBlank() const { return HasBit<std::to_underlying(Fields::StatInVbl)>(); }
 
-  [[nodiscard]] bool IsInHBlank() const { return HasBit<Fields::StatInHbl>(); }
+  [[nodiscard]] bool IsInHBlank() const { return HasBit<std::to_underlying(Fields::StatInHbl)>(); }
 
-  [[nodiscard]] bool IsVCountTrigger() const { return HasBit<Fields::StatInVct>(); }
+  [[nodiscard]] bool IsVCountTrigger() const {
+    return HasBit<std::to_underlying(Fields::StatInVct)>();
+  }
 
-  DispStat& RequestVBlankInterrupt() { return SetBit<Fields::StatVlcIrq>(); }
+  DispStat& RequestVBlankInterrupt() { return SetBit<std::to_underlying(Fields::StatVlcIrq)>(); }
 
-  DispStat& RequestHBlankInterrupt() { return SetBit<Fields::StatHblIrq>(); }
+  DispStat& RequestHBlankInterrupt() { return SetBit<std::to_underlying(Fields::StatHblIrq)>(); }
 
-  DispStat& RequestVCountInterrupt() { return SetBit<Fields::StatVctIrq>(); }
+  DispStat& RequestVCountInterrupt() { return SetBit<std::to_underlying(Fields::StatVctIrq)>(); }
 
  private:
-  enum Fields : uint8_t {
+  enum class Fields : uint8_t {
     StatInVbl = 0,
     StatInHbl = 1,
     StatInVct = 2,
