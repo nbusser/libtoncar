@@ -29,7 +29,7 @@ int main() {
 
   MGBA_LOG_INFO("Start");
 
-  dispcnt.Reset().SetMode(Dispcnt::Mode::DcntMode3).SetLayer(Dispcnt::Layer::DcntBg2);
+  dispcnt.Reset().SetMode(Dispcnt::Mode::DcntMode3).SetLayer<Dispcnt::Layer::DcntBg2>();
   screen.Mode3WritePixel(120, 80, colors15::kRed)
       .Mode3WritePixel(136, 80, colors15::kGreen)
       .Mode3WritePixel(120, 96, colors15::kBlue);

@@ -3,6 +3,7 @@
 #include <panic.h>
 
 #include <cstdint>
+#include <utility>
 
 #include "registers/registers.h"
 
@@ -22,25 +23,33 @@ class Dispcnt : public Register<Dispcnt, uint16_t, 0x00> {
   };
 
   /// Bits 8-12: DCNT_LAYER
-  enum class Layer : uint16_t {
-    DcntBg0 = 1 << 8,   // 0x0100
-    DcntBg1 = 1 << 9,   // 0x0200
-    DcntBg2 = 1 << 10,  // 0x0400
-    DcntBg3 = 1 << 11,  // 0x0800
-    DcntObj = 1 << 12   // 0x1000
+  /// One hot bit.
+  enum class Layer : uint8_t {
+    DcntBg0 = 8,   // 0x0100
+    DcntBg1 = 9,   // 0x0200
+    DcntBg2 = 10,  // 0x0400
+    DcntBg3 = 11,  // 0x0800
+    DcntObj = 12   // 0x1000
   };
 
-  Dispcnt& SetLayer(Layer layer) { return Or(static_cast<uint16_t>(layer)); }
+  template <Layer layer>
+  Dispcnt& SetLayer() {
+    return SetBit<std::to_underlying(layer)>();
+  }
 
-  Dispcnt& ClearLayer(Layer layer) { return And(~static_cast<uint16_t>(layer)); }
+  template <Layer layer>
+  Dispcnt& ClearLayer() {
+    return ClearBit<std::to_underlying(layer)>();
+  }
+
+  template <Layer layer>
+  [[nodiscard]] bool HasLayer() const {
+    return HasLayer<std::to_underlying(layer)>();
+  }
 
   Dispcnt& FlushLayers() { return And(0x0007); }
 
-  [[nodiscard]] bool HasLayer(Layer layer) const {
-    return GetAnd(static_cast<uint16_t>(layer)) != 0U;
-  }
-
-  Dispcnt& Reset() { return FlushLayers().SetMode(Mode::DcntMode0).SetLayer(Layer::DcntBg0); }
+  Dispcnt& Reset() { return FlushLayers().SetMode(Mode::DcntMode0).SetLayer<Layer::DcntBg0>(); }
 
   [[nodiscard]] Mode GetMode() const { return static_cast<Mode>(GetAnd(0x0007)); }
   Dispcnt& SetMode(Mode mode) {
