@@ -1,8 +1,8 @@
-# C/C++ GBA Bazel Base
+# libtoncar - GBA C++ lib
 
-Forked from https://github.com/depp/bazel-gba-example/tree/main.
+Based on https://github.com/nbusser/CPP-GBA-Bazel-Base.
 
-This is an example project for building a Game Boy Advance C/C++ game with Bazel.
+This repo hosts the modest libtoncar, a C++ lib inspired by libtonc, and built via Bazel.
 
 ## Building
 
