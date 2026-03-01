@@ -7,7 +7,8 @@
 namespace toncar {
 
 /// REG_DISPCNT: Display control register.
-class Dispcnt : public Register<Dispcnt, uint16_t, 0x00> {
+/// Default value: Mode0 + Layer0
+class Dispcnt : public Register<Dispcnt, uint16_t, 0x00, 0x0100> {
  public:
   /// Bits 0-2: DCNT_MODE
   enum class Mode : uint16_t {
@@ -28,39 +29,38 @@ class Dispcnt : public Register<Dispcnt, uint16_t, 0x00> {
     DcntObj = 1 << 12   // 0x1000
   };
 
-  static Dispcnt& SetLayer(Layer layer) { return Or(static_cast<uint16_t>(layer)); }
+  Dispcnt& SetLayer(Layer layer) { return Or(static_cast<uint16_t>(layer)); }
 
-  static Dispcnt& ClearLayer(Layer layer) { return And(~static_cast<uint16_t>(layer)); }
+  Dispcnt& ClearLayer(Layer layer) { return And(~static_cast<uint16_t>(layer)); }
 
-  static Dispcnt& FlushLayers() { return And(0x0007); }
+  Dispcnt& FlushLayers() { return And(0x0007); }
 
-  static bool HasLayer(Layer layer) { return GetAnd(static_cast<uint16_t>(layer)) != 0U; }
+  bool HasLayer(Layer layer) { return GetAnd(static_cast<uint16_t>(layer)) != 0U; }
 
-  static Mode GetMode() { return static_cast<Mode>(GetAnd(0x0007)); }
-  static Dispcnt& SetMode(Mode mode) {
+  using Register<Dispcnt, uint16_t, 0x00, 0x0100>::Reset;
+
+  Mode GetMode() { return static_cast<Mode>(GetAnd(0x0007)); }
+  Dispcnt& SetMode(Mode mode) {
     return And(static_cast<uint16_t>(~0x0007U)).Or(static_cast<uint16_t>(mode));
-  }
-
-  static Dispcnt& Reset() {
-    return FlushLayers().SetMode(Mode::DcntMode0).SetLayer(Layer::DcntBg0);
   }
 };
 
 /// REG_DISPSTAT: Display stat register.
-// TODO: could be more generic, but we will not over-engineer yet.
-class DispStat : Register<DispStat, uint16_t, 0x04> {
+/// TODO: could be more generic, but we will not over-engineer yet.
+/// TODO: Default value
+class DispStat : public Register<DispStat, uint16_t, 0x04, 0x00> {
  public:
-  [[nodiscard]] static bool IsInVBlank() { return HasBit<Fields::StatInVbl>(); }
+  [[nodiscard]] bool IsInVBlank() { return HasBit<Fields::StatInVbl>(); }
 
-  [[nodiscard]] static bool IsInHBlank() { return HasBit<Fields::StatInHbl>(); }
+  [[nodiscard]] bool IsInHBlank() { return HasBit<Fields::StatInHbl>(); }
 
-  [[nodiscard]] static bool IsVCountTrigger() { return HasBit<Fields::StatInVct>(); }
+  [[nodiscard]] bool IsVCountTrigger() { return HasBit<Fields::StatInVct>(); }
 
-  static DispStat& RequestVBlankInterrupt() { return SetBit<Fields::StatVlcIrq>(); }
+  DispStat& RequestVBlankInterrupt() { return SetBit<Fields::StatVlcIrq>(); }
 
-  static DispStat& RequestHBlankInterrupt() { return SetBit<Fields::StatHblIrq>(); }
+  DispStat& RequestHBlankInterrupt() { return SetBit<Fields::StatHblIrq>(); }
 
-  static DispStat& RequestVCountInterrupt() { return SetBit<Fields::StatVctIrq>(); }
+  DispStat& RequestVCountInterrupt() { return SetBit<Fields::StatVctIrq>(); }
 
  private:
   enum Fields : uint8_t {

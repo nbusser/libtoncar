@@ -1,114 +1,121 @@
 #pragma once
 
+#include <mgba/logger.h>
 #include <panic.h>
 #include <toncar.h>
 
+#include <cassert>
 #include <concepts>
 #include <cstdint>
 
 namespace toncar {
 
-template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io>
+template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io, T default_value>
 class RegisterBase;
 
-template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io>
-class Register : public RegisterBase<Derived, T, offset_from_io> {
+template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io, T default_value>
+class Register : public RegisterBase<Derived, T, offset_from_io, default_value> {
  protected:
-  static Derived& Set(T val) {
+  Derived& Set(T val) {
     Base::Ref() = val;
-    return Base::Self();
+    return static_cast<Derived&>(*this);
   }
 
-  static Derived& Or(T val) { return Set(Base::GetOr(val)); }
-  static Derived& And(T val) { return Set(Base::GetAnd(val)); }
+  Derived& Or(T val) { return Set(Base::GetOr(val)); }
+  Derived& And(T val) { return Set(Base::GetAnd(val)); }
 
  private:
-  using Base = RegisterBase<Derived, T, offset_from_io>;
+  using Base = RegisterBase<Derived, T, offset_from_io, default_value>;
 };
 
-template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io>
-class TransactionRegister : public RegisterBase<Derived, T, offset_from_io> {
+template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io, T default_value>
+class TransactionRegister : public RegisterBase<Derived, T, offset_from_io, default_value> {
  protected:
-  static Derived& Reset(bool force_read = false) {
-    staged_value = force_read ? Base::Ref() : last_commit_value;
-    return Base::Self();
+  Derived& Commit() {
+    Base::Ref() = staged_value_;
+    last_commit_value_ = staged_value_;
+    return static_cast<Derived&>(*this);
   }
 
-  static Derived& Commit() {
-    Base::Ref() = staged_value;
-    last_commit_value = staged_value;
-    return Base::Self();
+  Derived& Abort() {
+    staged_value_ = last_commit_value_;
+    return static_cast<Derived&>(*this);
   }
 
-  static Derived& Set(T val) {
-    staged_value = val;
-    return Base::Self();
+  Derived& Set(T val) {
+    staged_value_ = val;
+    return static_cast<Derived&>(*this);
   }
 
-  static Derived& Or(T val) { return Set(staged_value | val); }
-  static Derived& And(T val) { return Set(staged_value & val); }
+  Derived& Or(T val) { return Set(staged_value_ | val); }
+  Derived& And(T val) { return Set(staged_value_ & val); }
+
+ public:
+  TransactionRegister() : staged_value_{default_value}, last_commit_value_{default_value} {}
 
  private:
-  using Base = RegisterBase<Derived, T, offset_from_io>;
+  using Base = RegisterBase<Derived, T, offset_from_io, default_value>;
 
-  // WARNING: some registers might be read-only and might break the API if I init using `Ref()`.
-  inline static T staged_value{0};
-  inline static T last_commit_value{staged_value};
+  T staged_value_;
+  T last_commit_value_;
 };
 
-template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io>
+template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io, T default_value>
 class RegisterBase {
-  friend class Register<Derived, T, offset_from_io>;
-  friend class TransactionRegister<Derived, T, offset_from_io>;
+  friend class Register<Derived, T, offset_from_io, default_value>;
+  friend class TransactionRegister<Derived, T, offset_from_io, default_value>;
+
+ public:
+  static Derived& Instance() {
+    static Derived instance{};
+    return instance;
+  }
 
  protected:
-  static T Get() { return Ref(); }
+  T Get() { return Ref(); }
 
-  static T GetOr(T val) { return Ref() | val; }
-  static T GetAnd(T val) { return Ref() & val; }
+  T GetOr(T val) { return Ref() | val; }
+  T GetAnd(T val) { return Ref() & val; }
 
   template <uint8_t position>
-  static bool HasBit() {
-    static_assert(position < sizeof(T) * 8);
+  bool HasBit() {
+    assert(position < sizeof(T) * 8);
     constexpr T kMask{T{1} << position};
     return (Get() & kMask) == kMask;
   }
 
-  static Derived& Set(T /*val*/) {
+  Derived& Set(T /*val*/) {
     GBA_ASSERT(false);
-    return Self();
+    return static_cast<Derived&>(*this);
   }
 
-  static Derived& Or(T /*val*/) {
+  Derived& Or(T /*val*/) {
     GBA_ASSERT(false);
-    return Self();
+    return static_cast<Derived&>(*this);
   }
-  static Derived& And(T /*val*/) {
+  Derived& And(T /*val*/) {
     GBA_ASSERT(false);
-    return Self();
+    return static_cast<Derived&>(*this);
   }
 
   template <uint8_t position>
-  static Derived& SetBit() {
-    static_assert(position < sizeof(T) * 8);
+  Derived& SetBit() {
+    assert(position < sizeof(T) * 8);
     constexpr T kMask{T{1} << position};
     return Or(kMask);
   }
 
   template <uint8_t position>
-  static Derived& ClearBit() {
-    static_assert(position < sizeof(T) * 8);
+  Derived& ClearBit() {
+    assert(position < sizeof(T) * 8);
     constexpr T kMask{~(T{1} << position)};
     return And(kMask);
   }
 
- private:
-  static volatile T& Ref() { return *reinterpret_cast<volatile T*>(memory::kIo + offset_from_io); }
+  Derived& Reset() { return Set(default_value); }
 
-  static Derived& Self() {
-    static Derived instance{};
-    return instance;
-  }
+ private:
+  volatile T& Ref() { return *reinterpret_cast<volatile T*>(memory::kIo + offset_from_io); }
 };
 
 }  // namespace toncar

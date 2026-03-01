@@ -14,18 +14,17 @@ namespace toncar::mgba {
 
 namespace {
 
-class MgbaDebugRegister : Register<MgbaDebugRegister, uint16_t, 0x00FFF780> {
+class MgbaDebugRegister : public Register<MgbaDebugRegister, uint16_t, 0x00FFF780, 0x0000> {
  public:
-  static MgbaDebugRegister& Enable() { return Set(0xC0DE); }
-  static MgbaDebugRegister& Disable() { return Set(0x0); }
-  static bool IsEnabled() { return Get() == 0x1DEA; }
+  MgbaDebugRegister& Enable() { return Set(0xC0DE); }
+  MgbaDebugRegister& Disable() { return Set(0x0); }
+  bool IsEnabled() { return Get() == 0x1DEA; }
 };
 
-class MgbaDebugFlagsRegister : TransactionRegister<MgbaDebugFlagsRegister, uint16_t, 0x00FFF700> {
+class MgbaDebugFlagsRegister
+    : public TransactionRegister<MgbaDebugFlagsRegister, uint16_t, 0x00FFF700, 0x0000> {
  public:
-  static void SetLevel(Logger::Level level) {
-    Set(static_cast<uint16_t>(level)).Or(kMask).Commit();
-  }
+  void SetLevel(Logger::Level level) { Set(static_cast<uint16_t>(level)).Or(kMask).Commit(); }
 
  private:
   static constexpr uint16_t kMask{0x100};
@@ -43,7 +42,7 @@ ssize_t MgbaConsoleWrite(struct _reent* r __attribute__((unused)),
                          size_t len) {
   GBA_ASSERT(len <= kDebugStringMaxSize);
   strncpy(kRegDebugString, ptr, len);
-  MgbaDebugFlagsRegister::SetLevel(level);
+  MgbaDebugFlagsRegister::Instance().SetLevel(level);
   return static_cast<ssize_t>(len);
 }
 
@@ -87,14 +86,14 @@ Logger::Logger()
       dotab_stderr_{
           BuildDevoptTab<Logger::Level::Error>("mgba_stderr"),
       } {
-  MgbaDebugRegister::Enable();
-  GBA_ASSERT(MgbaDebugRegister::IsEnabled());
+  MgbaDebugRegister::Instance().Enable();
+  GBA_ASSERT(MgbaDebugRegister::Instance().IsEnabled());
   // TODO: check if it should be cleared on dtor
   devoptab_list[STD_OUT] = &dotab_stdout_;
   devoptab_list[STD_ERR] = &dotab_stderr_;
 }
 
-Logger::~Logger() { MgbaDebugRegister::Disable(); }
+Logger::~Logger() { MgbaDebugRegister::Instance().Disable(); }
 
 // NOLINTNEXTLINE(cert-dcl50-cpp)
 void Logger::Log(Level level, const char* ptr, ...) {
@@ -104,7 +103,7 @@ void Logger::Log(Level level, const char* ptr, ...) {
   va_start(args, ptr);
   static_cast<void>(vsnprintf(kRegDebugString, 0x100, ptr, args));
   va_end(args);
-  MgbaDebugFlagsRegister::SetLevel(level);
+  MgbaDebugFlagsRegister::Instance().SetLevel(level);
 
   GBA_ASSERT(level != Level::Fatal);
 }

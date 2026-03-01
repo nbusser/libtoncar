@@ -13,7 +13,12 @@ using namespace toncar;
 int main() {
   mgba::Logger::Log(mgba::Logger::Level::Info, "Start");
 
-  Dispcnt::Reset().SetMode(Dispcnt::Mode::DcntMode3).SetLayer(Dispcnt::Layer::DcntBg2);
+  // Dispcnt::Instance().Reset().SetMode(Dispcnt::Mode::DcntMode3).SetLayer(Dispcnt::Layer::DcntBg2);
+  Dispcnt::Instance()
+      .SetMode(Dispcnt::Mode::DcntMode0)
+      .SetLayer(Dispcnt::Layer::DcntBg0)
+      .SetMode(Dispcnt::Mode::DcntMode3)
+      .SetLayer(Dispcnt::Layer::DcntBg2);
   Screen::Mode3WritePixel(120, 80, colors15::kRed)
       .Mode3WritePixel(136, 80, colors15::kGreen)
       .Mode3WritePixel(120, 96, colors15::kBlue);
