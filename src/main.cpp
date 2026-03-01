@@ -11,14 +11,17 @@
 using namespace toncar;
 
 int main() {
+  Dispcnt& dispcnt = Dispcnt::Instance();
+  Screen& screen = Screen::Instance();
+  DispStat& dispstat = DispStat::Instance();
+
   mgba::Logger::Log(mgba::Logger::Level::Info, "Start");
 
-  Dispcnt::Instance().Reset().SetMode(Dispcnt::Mode::DcntMode3).SetLayer(Dispcnt::Layer::DcntBg2);
-  Screen::Instance()
-      .Mode3WritePixel(120, 80, colors15::kRed)
+  dispcnt.Reset().SetMode(Dispcnt::Mode::DcntMode3).SetLayer(Dispcnt::Layer::DcntBg2);
+  screen.Mode3WritePixel(120, 80, colors15::kRed)
       .Mode3WritePixel(136, 80, colors15::kGreen)
       .Mode3WritePixel(120, 96, colors15::kBlue);
-  DispStat::Instance().RequestHBlankInterrupt();
+  dispstat.RequestHBlankInterrupt();
 
   while (true) {
     VBlankIntrWait();
