@@ -96,12 +96,12 @@ Logger::Logger()
 Logger::~Logger() { MgbaDebugRegister::Instance().Disable(); }
 
 // NOLINTNEXTLINE(cert-dcl50-cpp)
-void Logger::Log(Level level, const char* ptr, ...) {
+void Logger::Log(Level level, const char* log_string, ...) {
   EnsureInstanceExists();
 
   va_list args;
-  va_start(args, ptr);
-  static_cast<void>(vsnprintf(kRegDebugString, 0x100, ptr, args));
+  va_start(args, log_string);
+  static_cast<void>(vsnprintf(kRegDebugString, 0x100, log_string, args));
   va_end(args);
   MgbaDebugFlagsRegister::Instance().SetLevel(level);
 
