@@ -3,12 +3,11 @@
 #include <cstdint>
 
 #include "registers/registers.h"
-#include "toncar.h"
 
 namespace toncar {
 
 /// REG_DISPCNT: Display control register.
-class Dispcnt : public Register<Dispcnt, uint16_t, memory::kIo> {
+class Dispcnt : public Register<Dispcnt, uint16_t, 0x00> {
  public:
   /// Bits 0-2: DCNT_MODE
   enum class Mode : uint16_t {
@@ -46,4 +45,22 @@ class Dispcnt : public Register<Dispcnt, uint16_t, memory::kIo> {
     return FlushLayers().SetMode(Mode::DcntMode0).SetLayer(Layer::DcntBg0);
   }
 };
+
+/// REG_DISPSTAT: Display stat register.
+// TODO: find better API
+class DispStat : Register<DispStat, uint16_t, 0x04> {
+ public:
+  [[nodiscard]] static bool IsInVBlank() { return (Get() & 0b1) == 1; }
+
+  [[nodiscard]] static bool IsInHBlank() { return ((Get() & 0b10) >> 1) == 1; }
+
+  [[nodiscard]] static bool IsVCountTrigger() { return ((Get() & 0b100) >> 2) == 1; }
+
+  static DispStat& RequestVBlankInterrupt() { return And(0b1000); }
+
+  static DispStat& RequestHBlankInterrupt() { return And(0b10000); }
+
+  static DispStat& RequestVCountInterrupt() { return And(0b100000); }
+};
+
 }  // namespace toncar

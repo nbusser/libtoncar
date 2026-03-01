@@ -1,10 +1,12 @@
 #pragma once
 
+#include <toncar.h>
+
 #include <cstdint>
 
 namespace toncar {
 
-template <typename Derived, typename T, uintptr_t addr>
+template <typename Derived, typename T, uint32_t offset_from_io>
 class Register {
  protected:
   static T Get() { return Ref(); }
@@ -24,7 +26,8 @@ class Register {
   }
 
  private:
-  static volatile T& Ref() { return *reinterpret_cast<volatile T*>(addr); }
+  static constexpr volatile T* kAddress{memory::kIo + offset_from_io};
+  static volatile T& Ref() { return *kAddress; }
 };
 
 }  // namespace toncar
