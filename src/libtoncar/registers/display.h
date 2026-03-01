@@ -7,8 +7,7 @@
 namespace toncar {
 
 /// REG_DISPCNT: Display control register.
-/// Default value: Mode0 + Layer0
-class Dispcnt : public Register<Dispcnt, uint16_t, 0x00, 0x0100> {
+class Dispcnt : public Register<Dispcnt, uint16_t, 0x00> {
  public:
   /// Bits 0-2: DCNT_MODE
   enum class Mode : uint16_t {
@@ -37,7 +36,7 @@ class Dispcnt : public Register<Dispcnt, uint16_t, 0x00, 0x0100> {
 
   bool HasLayer(Layer layer) { return GetAnd(static_cast<uint16_t>(layer)) != 0U; }
 
-  using Register<Dispcnt, uint16_t, 0x00, 0x0100>::Reset;
+  Dispcnt& Reset() { return FlushLayers().SetMode(Mode::DcntMode0).SetLayer(Layer::DcntBg0); }
 
   Mode GetMode() { return static_cast<Mode>(GetAnd(0x0007)); }
   Dispcnt& SetMode(Mode mode) {
@@ -47,8 +46,7 @@ class Dispcnt : public Register<Dispcnt, uint16_t, 0x00, 0x0100> {
 
 /// REG_DISPSTAT: Display stat register.
 /// TODO: could be more generic, but we will not over-engineer yet.
-/// TODO: Default value
-class DispStat : public Register<DispStat, uint16_t, 0x04, 0x00> {
+class DispStat : public Register<DispStat, uint16_t, 0x04> {
  public:
   [[nodiscard]] bool IsInVBlank() { return HasBit<Fields::StatInVbl>(); }
 

@@ -10,11 +10,11 @@
 
 namespace toncar {
 
-template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io, T default_value>
+template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io>
 class RegisterBase;
 
-template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io, T default_value>
-class Register : public RegisterBase<Derived, T, offset_from_io, default_value> {
+template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io>
+class Register : public RegisterBase<Derived, T, offset_from_io> {
  protected:
   Derived& Set(T val) {
     Base::Ref() = val;
@@ -25,11 +25,14 @@ class Register : public RegisterBase<Derived, T, offset_from_io, default_value> 
   Derived& And(T val) { return Set(Base::GetAnd(val)); }
 
  private:
-  using Base = RegisterBase<Derived, T, offset_from_io, default_value>;
+  using Base = RegisterBase<Derived, T, offset_from_io>;
 };
 
-template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io, T default_value>
-class TransactionRegister : public RegisterBase<Derived, T, offset_from_io, default_value> {
+template <typename Derived,
+          std::unsigned_integral T,
+          uint32_t offset_from_io,
+          T default_value = T{}>
+class TransactionRegister : public RegisterBase<Derived, T, offset_from_io> {
  protected:
   Derived& Commit() {
     Base::Ref() = staged_value_;
@@ -54,16 +57,16 @@ class TransactionRegister : public RegisterBase<Derived, T, offset_from_io, defa
   TransactionRegister() : staged_value_{default_value}, last_commit_value_{default_value} {}
 
  private:
-  using Base = RegisterBase<Derived, T, offset_from_io, default_value>;
+  using Base = RegisterBase<Derived, T, offset_from_io>;
 
   T staged_value_;
   T last_commit_value_;
 };
 
-template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io, T default_value>
+template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io>
 class RegisterBase {
-  friend class Register<Derived, T, offset_from_io, default_value>;
-  friend class TransactionRegister<Derived, T, offset_from_io, default_value>;
+  friend class Register<Derived, T, offset_from_io>;
+  friend class TransactionRegister<Derived, T, offset_from_io>;
 
  public:
   static Derived& Instance() {
@@ -111,8 +114,6 @@ class RegisterBase {
     constexpr T kMask{~(T{1} << position)};
     return And(kMask);
   }
-
-  Derived& Reset() { return Set(default_value); }
 
  private:
   volatile T& Ref() { return *reinterpret_cast<volatile T*>(memory::kIo + offset_from_io); }

@@ -14,7 +14,7 @@ namespace toncar::mgba {
 
 namespace {
 
-class MgbaDebugRegister : public Register<MgbaDebugRegister, uint16_t, 0x00FFF780, 0x0000> {
+class MgbaDebugRegister : public Register<MgbaDebugRegister, uint16_t, 0x00FFF780> {
  public:
   MgbaDebugRegister& Enable() { return Set(0xC0DE); }
   MgbaDebugRegister& Disable() { return Set(0x0); }
