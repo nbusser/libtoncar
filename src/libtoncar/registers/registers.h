@@ -3,11 +3,12 @@
 #include <panic.h>
 #include <toncar.h>
 
+#include <concepts>
 #include <cstdint>
 
 namespace toncar {
 
-template <typename Derived, typename T, uint32_t offset_from_io>
+template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io>
 class Register {
  protected:
   static T Get() { return Ref(); }
@@ -21,25 +22,29 @@ class Register {
   static Derived& Or(T val) { return Set(GetOr(val)); }
   static Derived& And(T val) { return Set(GetAnd(val)); }
 
-  static bool HasBit(uint8_t position) {
-    GBA_ASSERT(position < sizeof(T) * 8);
-    const T mask{1 << position};
-    return (Get() & mask) == mask;
+  template <uint8_t position>
+  static bool HasBit() {
+    static_assert(position < sizeof(T) * 8);
+    constexpr T kMask{T{1} << position};
+    return (Get() & kMask) == kMask;
   }
-  static Derived& SetBit(uint8_t position) {
-    GBA_ASSERT(position < sizeof(T) * 8);
-    const T mask{1 << position};
-    return Or(mask);
+
+  template <uint8_t position>
+  static Derived& SetBit() {
+    static_assert(position < sizeof(T) * 8);
+    constexpr T kMask{T{1} << position};
+    return Or(kMask);
   }
-  static Derived& ClearBit(uint8_t position) {
-    GBA_ASSERT(position < sizeof(T) * 8);
-    const T mask{~(1 << position)};
-    return And(mask);
+
+  template <uint8_t position>
+  static Derived& ClearBit() {
+    static_assert(position < sizeof(T) * 8);
+    constexpr T kMask{~(T{1} << position)};
+    return And(kMask);
   }
 
  private:
-  static constexpr volatile T* kAddress{memory::kIo + offset_from_io};
-  static volatile T& Ref() { return *kAddress; }
+  static volatile T& Ref() { return *reinterpret_cast<volatile T*>(memory::kIo + offset_from_io); }
 
   static Derived& Self() {
     static Derived instance{};

@@ -50,17 +50,27 @@ class Dispcnt : public Register<Dispcnt, uint16_t, 0x00> {
 // TODO: could be more generic, but we will not over-engineer yet.
 class DispStat : Register<DispStat, uint16_t, 0x04> {
  public:
-  [[nodiscard]] static bool IsInVBlank() { return HasBit(0); }
+  [[nodiscard]] static bool IsInVBlank() { return HasBit<Fields::StatInVbl>(); }
 
-  [[nodiscard]] static bool IsInHBlank() { return HasBit(1); }
+  [[nodiscard]] static bool IsInHBlank() { return HasBit<Fields::StatInHbl>(); }
 
-  [[nodiscard]] static bool IsVCountTrigger() { return HasBit(2); }
+  [[nodiscard]] static bool IsVCountTrigger() { return HasBit<Fields::StatInVct>(); }
 
-  static DispStat& RequestVBlankInterrupt() { return SetBit(3); }
+  static DispStat& RequestVBlankInterrupt() { return SetBit<Fields::StatVlcIrq>(); }
 
-  static DispStat& RequestHBlankInterrupt() { return SetBit(4); }
+  static DispStat& RequestHBlankInterrupt() { return SetBit<Fields::StatHblIrq>(); }
 
-  static DispStat& RequestVCountInterrupt() { return SetBit(5); }
+  static DispStat& RequestVCountInterrupt() { return SetBit<Fields::StatVctIrq>(); }
+
+ private:
+  enum Fields : uint8_t {
+    StatInVbl = 0,
+    StatInHbl = 1,
+    StatInVct = 2,
+    StatVlcIrq = 3,
+    StatHblIrq = 4,
+    StatVctIrq = 5,
+  };
 };
 
 }  // namespace toncar
