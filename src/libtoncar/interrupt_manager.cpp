@@ -112,8 +112,6 @@ Fnptr AddIrq(Interrupt interrupt, Fnptr isr) {
   bool ime_was_enabled{reg_ime.IsEnabled()};
   reg_ime.Disable();
 
-  EnableIrq(interrupt);
-
   // Finds in the `kIsrTable` either:
   // - a free slot (flag == 0)
   // - another entry for the same IRQ
@@ -169,12 +167,21 @@ InterruptManager::InterruptManager() {
   *kRegIsrMain = static_cast<Fnptr>(isr_master);
 
   ime.Enable();
-
-  static_cast<void>(DisableIrq);
 }
 
-void InterruptManager::AddInterruptHandler(Interrupt interrupt, Fnptr arm_handler) {
+InterruptManager& InterruptManager::AddInterruptHandler(Interrupt interrupt, Fnptr arm_handler) {
   AddIrq(interrupt, arm_handler);
+  return *this;
+}
+
+InterruptManager& InterruptManager::EnableInterrupt(Interrupt interrupt) {
+  EnableIrq(interrupt);
+  return *this;
+}
+
+InterruptManager& InterruptManager::DisableInterrupt(Interrupt interrupt) {
+  DisableIrq(interrupt);
+  return *this;
 }
 
 }  // namespace toncar
