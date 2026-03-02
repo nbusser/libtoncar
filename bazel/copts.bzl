@@ -58,6 +58,7 @@ _CXXOPTS_WARNING = [
     "-Wimplicit-fallthrough",
     "-Winit-self",
     "-Wnon-virtual-dtor",
+    "-Wnonnull",
     "-Wold-style-cast",
     "-Wpedantic",
     "-Wpointer-arith",

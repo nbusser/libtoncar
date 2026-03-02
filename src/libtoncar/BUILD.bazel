@@ -9,6 +9,7 @@ cc_library(
         "panic.cpp",
     ],
     hdrs = [
+        "attributes.h",
         "colors.h",
         "interrupt_manager.h",
         "mgba/logger.h",
