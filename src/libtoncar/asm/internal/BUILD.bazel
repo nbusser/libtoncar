@@ -1,0 +1,24 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+# Contains the proper .s definitions of functions exposed in `asm`.
+cc_library(
+    name = "internal",
+    srcs = [
+        "asm.h",  # Put in srcs to hide it to includers.
+        "bios.s",
+        "bios_ex.s",
+        "clr_blend_fast.s",
+        "clr_fade_fast.s",
+        "div_lut.s",
+        "isr_master.s",
+        "isr_nest.s",
+        "memcpy.s",
+        "memset.s",
+        "sin_lut.s",
+    ],
+    copts = [
+        "-x",
+        "assembler-with-cpp",
+    ],
+    visibility = ["//src/libtoncar/asm:__pkg__"],
+)

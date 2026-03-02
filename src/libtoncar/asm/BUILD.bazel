@@ -1,26 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-cc_library(
-    name = "asm_internal",
-    srcs = [
-        "asm.h",  # Put in srcs to hide it to includers.
-        "bios.s",
-        "bios_ex.s",
-        "clr_blend_fast.s",
-        "clr_fade_fast.s",
-        "div_lut.s",
-        "isr_master.s",
-        "isr_nest.s",
-        "memcpy.s",
-        "memset.s",
-        "sin_lut.s",
-    ],
-    copts = [
-        "-x",
-        "assembler-with-cpp",
-    ],
-)
-
 # Exposes the ASM implemented functions.
 cc_library(
     name = "asm",
@@ -32,5 +11,5 @@ cc_library(
     visibility = [
         "//src/libtoncar:__pkg__",
     ],
-    deps = [":asm_internal"],
+    deps = ["//src/libtoncar/asm/internal"],
 )
