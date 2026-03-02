@@ -115,7 +115,6 @@ Fnptr AddIrq(Interrupt interrupt, Fnptr isr) {
   // Finds in the `kIsrTable` either:
   // - a free slot (flag == 0)
   // - another entry for the same IRQ
-
   const auto irq_flag = static_cast<uint16_t>(1 << std::to_underlying(interrupt));
 
   IrqRec* entry_slot{nullptr};
@@ -151,6 +150,44 @@ Fnptr AddIrq(Interrupt interrupt, Fnptr isr) {
   return old_isr;
 }
 
+void DeleteIrq(Interrupt interrupt) {
+  InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
+
+  bool ime_was_enabled{reg_ime.IsEnabled()};
+  reg_ime.Disable();
+
+  const auto irq_flag = static_cast<uint16_t>(1 << std::to_underlying(interrupt));
+
+  for (uint32_t i{0}; i < kIsrTable.size();) {
+    IrqRec& current_entry{kIsrTable[i]};
+
+    // Empty slot -> no more IRQs
+    if (current_entry.flag == 0) {
+      break;
+    }
+    // Same flag: need to delete by shifting all the right elements to the left
+    if (current_entry.flag == irq_flag) {
+      uint32_t j{i};
+      for (; j < kIsrTable.size() - 1; ++j) {
+        kIsrTable[j] = kIsrTable[j + 1];
+        // Empty slot -> no more IRQs
+        if (kIsrTable[j + 1].flag == 0) {
+          break;
+        }
+      }
+      // If the table was full, we need to reset the last entry (duplicated).
+      if (j == kIsrTable.size() - 1) {
+        kIsrTable[j] = IrqRec{};
+      }
+    } else {
+      // Only increment if we did not delete.
+      ++i;
+    }
+  }
+
+  RestoreIme(ime_was_enabled);
+}
+
 /// REG_ISR_MAIN
 const auto kRegIsrMain = reinterpret_cast<volatile Fnptr*>(0x03007FFC);
 
@@ -171,6 +208,11 @@ InterruptManager::InterruptManager() {
 
 InterruptManager& InterruptManager::AddInterruptHandler(Interrupt interrupt, Fnptr arm_handler) {
   AddIrq(interrupt, arm_handler);
+  return *this;
+}
+
+InterruptManager& InterruptManager::DeleteInterruptHandler(Interrupt interrupt) {
+  DeleteIrq(interrupt);
   return *this;
 }
 

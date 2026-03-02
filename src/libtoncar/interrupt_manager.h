@@ -15,11 +15,13 @@ enum class Interrupt : uint8_t {
 
 class InterruptManager {
  public:
-  InterruptManager& AddInterruptHandler(Interrupt interrupt, Fnptr arm_handler);
-
   InterruptManager& EnableInterrupt(Interrupt interrupt);
 
   InterruptManager& DisableInterrupt(Interrupt interrupt);
+
+  InterruptManager& AddInterruptHandler(Interrupt interrupt, Fnptr arm_handler);
+
+  InterruptManager& DeleteInterruptHandler(Interrupt interrupt);
 
   static InterruptManager& GetInstance() {
     static InterruptManager instance{};
