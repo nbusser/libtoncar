@@ -53,6 +53,7 @@ void RestoreIme(bool was_enabled) {
   }
 }
 
+/// Sets the proper flags in `REG_DISPSTAT` and `REG_IE` to enable the interrupt.
 void EnableIrq(Interrupt interrupt) {
   DispStat& reg_dispstat{DispStat::Instance()};
   InterruptEnable& reg_ie{InterruptEnable::Instance()};
@@ -80,6 +81,7 @@ void EnableIrq(Interrupt interrupt) {
   }
 }
 
+/// Clears the proper flags in `REG_DISPSTAT` and `REG_IE` to disable the interrupt.
 void DisableIrq(Interrupt interrupt) {
   DispStat& reg_dispstat{DispStat::Instance()};
   InterruptEnable& reg_ie{InterruptEnable::Instance()};
@@ -106,6 +108,9 @@ void DisableIrq(Interrupt interrupt) {
   }
 }
 
+/// Interfaces with libtonc's `isr_master()`.
+/// Finds an entry for `interrupt` in `kIsrTable` and erase it with a new one.
+/// Appends the handler as a new entry if not found.
 Fnptr SetIrq(Interrupt interrupt, Fnptr isr) {
   InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
 
@@ -149,6 +154,9 @@ Fnptr SetIrq(Interrupt interrupt, Fnptr isr) {
   return old_isr;
 }
 
+/// Interfaces with libtonc's `isr_master()`.
+/// Finds the entry for `interrupt` in `kIsrTable` and deletes it.
+/// Do nothing if not found.
 void DeleteIrq(Interrupt interrupt) {
   InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
 
@@ -191,6 +199,8 @@ const auto kRegIsrMain = reinterpret_cast<volatile Fnptr*>(0x03007FFC);
 
 }  // namespace
 
+/// Private CTor created by `GetInstance()`.
+/// Clears the `kIsrTable`, sets `isr_master` on `REG_ISR_MAIN` and  enable `REG_IME`.
 InterruptManager::InterruptManager() {
   InterruptMasterEnable& ime{InterruptMasterEnable::Instance()};
   ime.Disable();

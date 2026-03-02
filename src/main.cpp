@@ -1,5 +1,4 @@
 #include <asm/bios.h>
-#include <tonc.h>
 #include <toncar.h>
 
 #include <cstdlib>
@@ -42,6 +41,6 @@ int main() {
       .Mode3WritePixel(120, 96, colors15::kBlue);
 
   while (true) {
-    toncar::VBlankIntrWait();
+    VBlankIntrWait();
   }
 }

@@ -90,6 +90,7 @@
     "srcs",
     "Starlark",
     "startfile",
+    "subpackages",
     "tdmi",
     "thinlto",
     "threadsafe",

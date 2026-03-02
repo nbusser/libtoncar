@@ -29,6 +29,6 @@ cc_library(
         "@//platform:os",
         "@//platform:arm7tdmi",
     ],
-    visibility = ["//visibility:public"],
+    visibility = ["//src:__subpackages__"],
     deps = [":libtonc_asm"],
 )

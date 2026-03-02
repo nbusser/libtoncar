@@ -21,6 +21,6 @@ cc_library(
     ],
     copts = CXXOPTS,
     includes = ["."],
-    visibility = ["//visibility:public"],
+    visibility = ["//src:__subpackages__"],
     deps = ["//src/libtoncar/asm"],
 )
