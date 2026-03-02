@@ -21,6 +21,8 @@ class InterruptManager {
 
   InterruptManager& AddInterruptHandler(Interrupt interrupt, Fnptr arm_handler);
 
+  InterruptManager& ReplaceInterruptHandler(Interrupt interrupt, Fnptr arm_handler);
+
   InterruptManager& DeleteInterruptHandler(Interrupt interrupt);
 
   static InterruptManager& GetInstance() {

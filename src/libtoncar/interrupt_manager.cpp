@@ -106,7 +106,29 @@ void DisableIrq(Interrupt interrupt) {
   }
 }
 
-Fnptr AddIrq(Interrupt interrupt, Fnptr isr) {
+void AddIrq(Interrupt interrupt, Fnptr isr) {
+  InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
+
+  bool ime_was_enabled{reg_ime.IsEnabled()};
+  reg_ime.Disable();
+
+  bool found{false};
+  for (IrqRec& entry : kIsrTable) {
+    if (entry.flag == 0) {
+      found = true;
+      entry = IrqRec{.flag = static_cast<uint32_t>(1 << std::to_underlying(interrupt)), .isr = isr};
+      break;
+    }
+  }
+
+  if (!found) {
+    MGBA_LOG_FATAL("No available slot for adding interrupt \"%d\"", std::to_underlying(interrupt));
+  }
+
+  RestoreIme(ime_was_enabled);
+}
+
+Fnptr ReplaceIrq(Interrupt interrupt, Fnptr isr) {
   InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
 
   bool ime_was_enabled{reg_ime.IsEnabled()};
@@ -135,7 +157,6 @@ Fnptr AddIrq(Interrupt interrupt, Fnptr isr) {
   // No entry to replace and no more slot available. Crashing.
   if (entry_slot == nullptr) {
     MGBA_LOG_FATAL("No available slot for adding interrupt \"%d\"", std::to_underlying(interrupt));
-    GBA_ASSERT(false);
   }
 
   // Replacing the found entry with our information.
@@ -206,16 +227,6 @@ InterruptManager::InterruptManager() {
   ime.Enable();
 }
 
-InterruptManager& InterruptManager::AddInterruptHandler(Interrupt interrupt, Fnptr arm_handler) {
-  AddIrq(interrupt, arm_handler);
-  return *this;
-}
-
-InterruptManager& InterruptManager::DeleteInterruptHandler(Interrupt interrupt) {
-  DeleteIrq(interrupt);
-  return *this;
-}
-
 InterruptManager& InterruptManager::EnableInterrupt(Interrupt interrupt) {
   EnableIrq(interrupt);
   return *this;
@@ -223,6 +234,22 @@ InterruptManager& InterruptManager::EnableInterrupt(Interrupt interrupt) {
 
 InterruptManager& InterruptManager::DisableInterrupt(Interrupt interrupt) {
   DisableIrq(interrupt);
+  return *this;
+}
+
+InterruptManager& InterruptManager::AddInterruptHandler(Interrupt interrupt, Fnptr arm_handler) {
+  AddIrq(interrupt, arm_handler);
+  return *this;
+}
+
+InterruptManager& InterruptManager::ReplaceInterruptHandler(Interrupt interrupt,
+                                                            Fnptr arm_handler) {
+  ReplaceIrq(interrupt, arm_handler);
+  return *this;
+}
+
+InterruptManager& InterruptManager::DeleteInterruptHandler(Interrupt interrupt) {
+  DeleteIrq(interrupt);
   return *this;
 }
 
