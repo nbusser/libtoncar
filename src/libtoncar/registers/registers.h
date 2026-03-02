@@ -5,6 +5,7 @@
 #include <toncar.h>
 
 #include <concepts>
+#include <cstddef>
 #include <cstdint>
 
 namespace toncar {
@@ -102,7 +103,7 @@ class RegisterBase {
   template <uint8_t position>
   Derived& ClearBit() {
     static_assert(position < sizeof(T) * 8);
-    constexpr T kMask{~(T{1} << position)};
+    constexpr T kMask{static_cast<T>(~(T{1} << position))};
     return static_cast<Derived&>(*this).And(kMask);
   }
 

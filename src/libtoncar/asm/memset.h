@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "asm/attributes.h"
+#include "attributes.h"
 
 // NOLINTBEGIN(readability-identifier-naming): use C naming conventions
 

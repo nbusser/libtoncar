@@ -7,14 +7,14 @@
 #include "asm.h"
 
 	.file	"isr_master.s"
-	.extern	__isr_table;
+	.extern	isr_table;
 
 /*! \fn IWRAM_CODE void isr_master()
 	\brief	Default irq dispatcher (no automatic nesting)
 */
 	@ Register list
 	@ r0 : &REG_IE
-	@ r1 : __isr_table / isr
+	@ r1 : isr_table / isr
 	@ r2 : IF & IE
 	@ r3 : tmp
 	@ ip : (IF,IE)	
@@ -31,7 +31,7 @@ BEGIN_FUNC_ARM(isr_master, CSEC_IWRAM)
 	str		r3, [r0, #-0x208]
 
 	@ Search for irq.
-	ldr		r1, =__isr_table
+	ldr		r1, =isr_table
 
 .Lirq_search:
 		ldr		r3, [r1], #8 
@@ -42,7 +42,7 @@ BEGIN_FUNC_ARM(isr_master, CSEC_IWRAM)
 
 	@ Search over : return if no isr, otherwise continue.
 .Lpost_search:
-	ldrne	r1, [r1, #-4]		@ isr= __isr_table[ii-1].isr
+	ldrne	r1, [r1, #-4]		@ isr= isr_table[ii-1].isr
 	cmpne	r1, #0
 	bxeq	lr					@ If no isr: quit
 

@@ -41,6 +41,7 @@ Checks: >
   -modernize-use-std-print,
   -performance-enum-size,
   -performance-no-int-to-ptr,
+  -readability-convert-member-functions-to-static,
   -readability-identifier-length,
   -readability-magic-numbers,
   -readability-static-accessed-through-instance,

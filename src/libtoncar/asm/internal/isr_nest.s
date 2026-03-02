@@ -7,7 +7,7 @@
 #include "asm.h"
 
 	.file "isr_nest.s"
-	.extern	__isr_table;
+	.extern	isr_table;
 
 /*! \fn IWRAM_CODE void isr_master_nest()
 	\brief	Main ISR for using prioritized nested interrupts
@@ -22,10 +22,10 @@ BEGIN_FUNC_ARM(isr_master_nest, CSEC_IWRAM)
 	orr		r1, r1, r2
 	str		r1, [r3, #-0x208]
 
-	@ --- Find raised irq in __isr_table ---
-	@ r0 := IRQ_REC *pir= __isr_table
+	@ --- Find raised irq in isr_table ---
+	@ r0 := IRQ_REC *pir= isr_table
 	@ r12:= irq_prio (higher priority irqs)
-	ldr		r0, =__isr_table
+	ldr		r0, =isr_table
 	mov		r12, #0
 .Lirq_search:
 		ldr		r1, [r0], #8 

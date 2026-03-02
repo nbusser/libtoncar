@@ -1,0 +1,4 @@
+Diagnostics:
+  Suppress:
+    # Use gcc only macro.
+    -Wunknown-attributes

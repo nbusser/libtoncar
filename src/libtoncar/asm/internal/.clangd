@@ -2,3 +2,4 @@ Diagnostics:
   Suppress:
     # For asm.h on macro #undef CSEC_EWRAM.
     - invalid_operator_on_type
+    - expected_either

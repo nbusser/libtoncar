@@ -3,8 +3,11 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 # Exposes the ASM implemented functions.
 cc_library(
     name = "asm",
+    srcs = ["interrupt.cpp"],
     hdrs = [
         "attributes.h",
+        "bios.h",
+        "interrupt.h",
         "memcpy.h",
         "memset.h",
     ],

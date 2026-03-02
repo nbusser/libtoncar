@@ -44,7 +44,7 @@ class Dispcnt : public Register<Dispcnt, uint16_t, 0x00> {
 
   template <Layer layer>
   [[nodiscard]] bool HasLayer() const {
-    return HasLayer<std::to_underlying(layer)>();
+    return HasBit<std::to_underlying(layer)>();
   }
 
   Dispcnt& FlushLayers() { return And(0x0007); }
@@ -69,11 +69,23 @@ class DispStat : public Register<DispStat, uint16_t, 0x04> {
     return HasBit<std::to_underlying(Fields::StatInVct)>();
   }
 
-  DispStat& RequestVBlankInterrupt() { return SetBit<std::to_underlying(Fields::StatVlcIrq)>(); }
+  DispStat& RequestInterrupt() { return SetBit<std::to_underlying(Fields::StatVlcIrq)>(); }
 
   DispStat& RequestHBlankInterrupt() { return SetBit<std::to_underlying(Fields::StatHblIrq)>(); }
 
   DispStat& RequestVCountInterrupt() { return SetBit<std::to_underlying(Fields::StatVctIrq)>(); }
+
+  DispStat& CancelVBlankInterruptRequest() {
+    return ClearBit<std::to_underlying(Fields::StatVlcIrq)>();
+  }
+
+  DispStat& CancelHBlankInterruptRequest() {
+    return ClearBit<std::to_underlying(Fields::StatHblIrq)>();
+  }
+
+  DispStat& CancelVCountInterruptRequest() {
+    return ClearBit<std::to_underlying(Fields::StatVctIrq)>();
+  }
 
  private:
   enum class Fields : uint8_t {
