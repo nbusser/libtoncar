@@ -5,7 +5,6 @@
 #include <toncar.h>
 
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 
 namespace toncar {

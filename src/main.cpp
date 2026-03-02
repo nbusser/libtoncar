@@ -1,7 +1,10 @@
+#include <asm/bios.h>
 #include <tonc.h>
+#include <toncar.h>
 
 #include <cstdlib>
 
+#include "interrupt_manager.h"
 #include "libtoncar/colors.h"
 #include "libtoncar/registers/display.h"
 #include "libtoncar/screen.h"
@@ -10,22 +13,11 @@
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace toncar;
 
-namespace {
-// Waiting for a proper VBlank synchronizer.
-void ManualVsync() {
-  // Wait until VDraw
-  while (VCount::Instance().Value() >= 160) {
-  }
-  // Wait until VBlank
-  while (VCount::Instance().Value() < 160) {
-  }
-}
-}  // namespace
-
 int main() {
+  InterruptManager::GetInstance().AddInterruptHandler(Interrupt::VBlank, nullptr);
+
   Dispcnt& dispcnt = Dispcnt::Instance();
   Screen& screen = Screen::Instance();
-  // DispStat& dispstat = DispStat::Instance();
 
   MGBA_LOG_INFO("Start");
 
@@ -35,6 +27,6 @@ int main() {
       .Mode3WritePixel(120, 96, colors15::kBlue);
 
   while (true) {
-    ManualVsync();
+    toncar::VBlankIntrWait();
   }
 }

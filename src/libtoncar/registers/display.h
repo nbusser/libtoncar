@@ -69,14 +69,14 @@ class DispStat : public Register<DispStat, uint16_t, 0x04> {
     return HasBit<std::to_underlying(Fields::StatInVct)>();
   }
 
-  DispStat& RequestInterrupt() { return SetBit<std::to_underlying(Fields::StatVlcIrq)>(); }
+  DispStat& RequestVBlankInterrupt() { return SetBit<std::to_underlying(Fields::StatVblIrq)>(); }
 
   DispStat& RequestHBlankInterrupt() { return SetBit<std::to_underlying(Fields::StatHblIrq)>(); }
 
   DispStat& RequestVCountInterrupt() { return SetBit<std::to_underlying(Fields::StatVctIrq)>(); }
 
   DispStat& CancelVBlankInterruptRequest() {
-    return ClearBit<std::to_underlying(Fields::StatVlcIrq)>();
+    return ClearBit<std::to_underlying(Fields::StatVblIrq)>();
   }
 
   DispStat& CancelHBlankInterruptRequest() {
@@ -92,7 +92,7 @@ class DispStat : public Register<DispStat, uint16_t, 0x04> {
     StatInVbl = 0,
     StatInHbl = 1,
     StatInVct = 2,
-    StatVlcIrq = 3,
+    StatVblIrq = 3,
     StatHblIrq = 4,
     StatVctIrq = 5,
   };

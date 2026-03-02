@@ -44,18 +44,23 @@ class InterruptMasterEnable : public Register<InterruptMasterEnable, uint16_t, 0
   [[nodiscard]] bool IsEnabled() const { return Get() == 1; }
 };
 
-void EnableIrq(Interrupt interrupt) {
+void RestoreIme(bool was_enabled) {
   InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
+  if (was_enabled) {
+    reg_ime.Enable();
+  } else {
+    reg_ime.Disable();
+  }
+}
+
+void EnableIrq(Interrupt interrupt) {
   DispStat& reg_dispstat{DispStat::Instance()};
   InterruptEnable& reg_ie{InterruptEnable::Instance()};
-
-  bool ime_was_enabled{reg_ime.IsEnabled()};
-  reg_ime.Disable();
 
   // TODO: could be templated but would imply putting everything in header. Evaluate what we want
   switch (interrupt) {
     case Interrupt::VBlank: {
-      reg_dispstat.RequestHBlankInterrupt();
+      reg_dispstat.RequestVBlankInterrupt();
       reg_ie.EnableIrqVBlank();
       break;
     }
@@ -73,21 +78,11 @@ void EnableIrq(Interrupt interrupt) {
       MGBA_LOG_FATAL("Interrupt \"%d\" not supported yet", std::to_underlying(interrupt));
     }
   }
-
-  if (ime_was_enabled) {
-    reg_ime.Enable();
-  } else {
-    reg_ime.Disable();
-  }
 }
 
 void DisableIrq(Interrupt interrupt) {
-  InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
   DispStat& reg_dispstat{DispStat::Instance()};
   InterruptEnable& reg_ie{InterruptEnable::Instance()};
-
-  bool ime_was_enabled{reg_ime.IsEnabled()};
-  reg_ime.Disable();
 
   switch (interrupt) {
     case Interrupt::VBlank: {
@@ -109,12 +104,53 @@ void DisableIrq(Interrupt interrupt) {
       MGBA_LOG_FATAL("Interrupt \"%d\" not supported yet", std::to_underlying(interrupt));
     }
   }
+}
 
-  if (ime_was_enabled) {
-    reg_ime.Enable();
-  } else {
-    reg_ime.Disable();
+Fnptr AddIrq(Interrupt interrupt, Fnptr isr) {
+  InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
+
+  bool ime_was_enabled{reg_ime.IsEnabled()};
+  reg_ime.Disable();
+
+  EnableIrq(interrupt);
+
+  // Finds in the `kIsrTable` either:
+  // - a free slot (flag == 0)
+  // - another entry for the same IRQ
+
+  const auto irq_flag = static_cast<uint16_t>(1 << std::to_underlying(interrupt));
+
+  IrqRec* entry_slot{nullptr};
+
+  for (IrqRec& entry : kIsrTable) {
+    // Empty slot
+    if (entry.flag == 0) {
+      entry_slot = &entry;
+      break;
+    }
+    // Same Interrupt to be replaced
+    if (entry.flag == irq_flag) {
+      entry_slot = &entry;
+      break;
+    }
   }
+
+  // No entry to replace and no more slot available. Crashing.
+  if (entry_slot == nullptr) {
+    MGBA_LOG_FATAL("No available slot for adding interrupt \"%d\"", std::to_underlying(interrupt));
+    GBA_ASSERT(false);
+  }
+
+  // Replacing the found entry with our information.
+  Fnptr old_isr = entry_slot->isr;
+  *entry_slot = IrqRec{
+      .flag = irq_flag,
+      .isr = isr,
+  };
+
+  RestoreIme(ime_was_enabled);
+
+  return old_isr;
 }
 
 /// REG_ISR_MAIN
@@ -137,6 +173,8 @@ InterruptManager::InterruptManager() {
   static_cast<void>(DisableIrq);
 }
 
-void InterruptManager::RequestInterrupt(Interrupt interrupt) { EnableIrq(interrupt); }
+void InterruptManager::AddInterruptHandler(Interrupt interrupt, Fnptr arm_handler) {
+  AddIrq(interrupt, arm_handler);
+}
 
 }  // namespace toncar

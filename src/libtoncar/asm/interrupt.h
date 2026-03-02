@@ -11,9 +11,10 @@ struct IrqRec {
   Fnptr isr{nullptr};
 };
 
-static constexpr uint32_t kInterruptionMax{14};
+// Matches libtonc original's `II_MAX`.
+static constexpr uint32_t kInterruptionMax{15};
 
-// Referenced in assembly file. Use extern C to avoid name mangling.
+// libtonc's priority IRQ tables. Filled by `InterruptManager` and read by the assembly code.
 // NOLINT(*-avoid-c-arrays): accessed in assembly files
 extern "C" IrqRec isr_table[kInterruptionMax];
 
