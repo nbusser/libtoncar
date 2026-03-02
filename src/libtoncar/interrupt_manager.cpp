@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <utility>
 
+#include "attributes.h"
 #include "mgba/logger.h"
 #include "registers/display.h"
 #include "registers/registers.h"
@@ -27,6 +28,7 @@ class InterruptEnable : public Register<InterruptEnable, uint16_t, 0x0200> {
 };
 
 /// REG_IF
+/// Unused. libtonc's assembly ARM routines already acknowledge interruptions.
 class InterruptRequestFlags : public Register<InterruptRequestFlags, uint16_t, 0x0202> {
  public:
   InterruptRequestFlags& AckIrqVBlank() { return Set(1 << std::to_underlying(Interrupt::VBlank)); }
@@ -44,14 +46,30 @@ class InterruptMasterEnable : public Register<InterruptMasterEnable, uint16_t, 0
   [[nodiscard]] bool IsEnabled() const { return Get() == 1; }
 };
 
-void RestoreIme(bool was_enabled) {
-  InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
-  if (was_enabled) {
-    reg_ime.Enable();
-  } else {
-    reg_ime.Disable();
+/// Disables the `REG_IME` on construction.
+/// Restores the previous state of `REG_IME` on destruction.
+/// Ensures that no interruption ever happen when we are manipulating interruption handler tables.
+class RegImeLock {
+ public:
+  RegImeLock() : reg_ime_{InterruptMasterEnable::Instance()}, was_enabled_{reg_ime_.IsEnabled()} {
+    reg_ime_.Disable();
   }
-}
+
+  ~RegImeLock() {
+    if (was_enabled_) {
+      reg_ime_.Enable();
+    }
+  }
+
+  RegImeLock(const RegImeLock&) = delete;
+  RegImeLock(RegImeLock&&) = delete;
+  RegImeLock& operator=(const RegImeLock&) = delete;
+  RegImeLock& operator=(RegImeLock&&) = delete;
+
+ private:
+  InterruptMasterEnable& reg_ime_;
+  bool was_enabled_;
+};
 
 /// Sets the proper flags in `REG_DISPSTAT` and `REG_IE` to enable the interrupt.
 void EnableIrq(Interrupt interrupt) {
@@ -112,11 +130,6 @@ void DisableIrq(Interrupt interrupt) {
 /// Finds an entry for `interrupt` in `kIsrTable` and erase it with a new one.
 /// Appends the handler as a new entry if not found.
 Fnptr SetIrq(Interrupt interrupt, Fnptr isr) {
-  InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
-
-  bool ime_was_enabled{reg_ime.IsEnabled()};
-  reg_ime.Disable();
-
   // Finds in the `kIsrTable` either:
   // - a free slot (flag == 0)
   // - another entry for the same IRQ
@@ -149,8 +162,6 @@ Fnptr SetIrq(Interrupt interrupt, Fnptr isr) {
       .isr = isr,
   };
 
-  RestoreIme(ime_was_enabled);
-
   return old_isr;
 }
 
@@ -158,15 +169,10 @@ Fnptr SetIrq(Interrupt interrupt, Fnptr isr) {
 /// Finds the entry for `interrupt` in `kIsrTable` and deletes it.
 /// Do nothing if not found.
 void DeleteIrq(Interrupt interrupt) {
-  InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
-
-  bool ime_was_enabled{reg_ime.IsEnabled()};
-  reg_ime.Disable();
-
   const auto irq_flag = static_cast<uint16_t>(1 << std::to_underlying(interrupt));
 
   for (uint32_t i{0}; i < kIsrTable.size(); ++i) {
-    IrqRec& current_entry{kIsrTable[i]};
+    const IrqRec& current_entry{kIsrTable[i]};
 
     // Empty slot -> no more IRQs
     if (current_entry.flag == 0) {
@@ -190,8 +196,6 @@ void DeleteIrq(Interrupt interrupt) {
       break;
     }
   }
-
-  RestoreIme(ime_was_enabled);
 }
 
 /// REG_ISR_MAIN
@@ -215,22 +219,26 @@ InterruptManager::InterruptManager() {
 }
 
 InterruptManager& InterruptManager::EnableInterrupt(Interrupt interrupt) {
+  const RegImeLock lock{};
   EnableIrq(interrupt);
   return *this;
 }
 
 InterruptManager& InterruptManager::DisableInterrupt(Interrupt interrupt) {
+  const RegImeLock lock{};
   DisableIrq(interrupt);
   return *this;
 }
 
 InterruptManager& InterruptManager::SetInterruptHandler(Interrupt interrupt,
                                                         Fnptr handler TONCAR_NONNULL) {
+  const RegImeLock lock{};
   SetIrq(interrupt, handler);
   return *this;
 }
 
 InterruptManager& InterruptManager::DeleteInterruptHandler(Interrupt interrupt) {
+  const RegImeLock lock{};
   DeleteIrq(interrupt);
   return *this;
 }

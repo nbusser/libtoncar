@@ -29,7 +29,7 @@ class InterruptManager {
 
   InterruptManager& DeleteInterruptHandler(Interrupt interrupt);
 
-  static InterruptManager& GetInstance() {
+  static InterruptManager& Instance() {
     static InterruptManager instance{};
     return instance;
   }

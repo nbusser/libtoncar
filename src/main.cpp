@@ -1,6 +1,6 @@
 #include <asm/bios.h>
-#include <toncar.h>
 
+#include <cstdint>
 #include <cstdlib>
 
 #include "interrupt_manager.h"
@@ -23,7 +23,7 @@ void VBlankCounter() {
 }  // namespace
 
 int main() {
-  InterruptManager::GetInstance()
+  InterruptManager::Instance()
       .SetInterruptHandler(Interrupt::VBlank, VBlankCounter)
       .SetInterruptHandler(Interrupt::VBlank, VBlankCounter)
       .EnableInterrupt(Interrupt::VBlank);

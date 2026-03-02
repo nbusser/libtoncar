@@ -3,6 +3,8 @@
 #include <panic.h>
 #include <registers/registers.h>
 #include <sys/iosupport.h>
+#include <sys/reent.h>
+#include <sys/types.h>
 
 #include <cstdarg>
 #include <cstdint>
@@ -36,10 +38,7 @@ constexpr size_t kDebugStringMaxSize{0x100};
 const auto kRegDebugString = reinterpret_cast<char*>(0x4FFF600);
 
 template <Logger::Level level>
-ssize_t MgbaConsoleWrite(struct _reent* r __attribute__((unused)),
-                         void* fd __attribute__((unused)),
-                         const char* ptr,
-                         size_t len) {
+ssize_t MgbaConsoleWrite(struct _reent* /*r*/, void* /*fd*/, const char* ptr, size_t len) {
   GBA_ASSERT(len <= kDebugStringMaxSize);
   strncpy(kRegDebugString, ptr, len);
   MgbaDebugFlagsRegister::Instance().SetLevel(level);
