@@ -12,6 +12,7 @@ cc_library(
         "mgba/logger.h",
         "panic.h",
         "registers/display.h",
+        "registers/interrupt.h",
         "registers/registers.h",
         "screen.h",
         "toncar.h",
@@ -19,4 +20,5 @@ cc_library(
     copts = CXXOPTS,
     includes = ["."],
     visibility = ["//visibility:public"],
+    deps = ["//src/libtoncar/asm"],
 )
