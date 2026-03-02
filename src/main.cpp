@@ -19,13 +19,14 @@ uint32_t vblank_counter{0};
 
 void VBlankCounter() {
   ++vblank_counter;
-  MGBA_LOG_DEBUG("VBlank counter: %lu", vblank_counter);
+  MGBA_LOG_DEBUG("VBlank counter: %lu", static_cast<unsigned long>(vblank_counter));
 }
 }  // namespace
 
 int main() {
   InterruptManager::GetInstance()
-      .AddInterruptHandler(Interrupt::VBlank, VBlankCounter)
+      .SetInterruptHandler(Interrupt::VBlank, VBlankCounter)
+      .SetInterruptHandler(Interrupt::VBlank, VBlankCounter)
       .EnableInterrupt(Interrupt::VBlank);
 
   Dispcnt& dispcnt = Dispcnt::Instance();

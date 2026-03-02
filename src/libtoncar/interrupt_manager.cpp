@@ -106,29 +106,7 @@ void DisableIrq(Interrupt interrupt) {
   }
 }
 
-void AddIrq(Interrupt interrupt, Fnptr isr) {
-  InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
-
-  bool ime_was_enabled{reg_ime.IsEnabled()};
-  reg_ime.Disable();
-
-  bool found{false};
-  for (IrqRec& entry : kIsrTable) {
-    if (entry.flag == 0) {
-      found = true;
-      entry = IrqRec{.flag = static_cast<uint32_t>(1 << std::to_underlying(interrupt)), .isr = isr};
-      break;
-    }
-  }
-
-  if (!found) {
-    MGBA_LOG_FATAL("No available slot for adding interrupt \"%d\"", std::to_underlying(interrupt));
-  }
-
-  RestoreIme(ime_was_enabled);
-}
-
-Fnptr ReplaceIrq(Interrupt interrupt, Fnptr isr) {
+Fnptr SetIrq(Interrupt interrupt, Fnptr isr) {
   InterruptMasterEnable& reg_ime{InterruptMasterEnable::Instance()};
 
   bool ime_was_enabled{reg_ime.IsEnabled()};
@@ -179,7 +157,7 @@ void DeleteIrq(Interrupt interrupt) {
 
   const auto irq_flag = static_cast<uint16_t>(1 << std::to_underlying(interrupt));
 
-  for (uint32_t i{0}; i < kIsrTable.size();) {
+  for (uint32_t i{0}; i < kIsrTable.size(); ++i) {
     IrqRec& current_entry{kIsrTable[i]};
 
     // Empty slot -> no more IRQs
@@ -200,9 +178,8 @@ void DeleteIrq(Interrupt interrupt) {
       if (j == kIsrTable.size() - 1) {
         kIsrTable[j] = IrqRec{};
       }
-    } else {
-      // Only increment if we did not delete.
-      ++i;
+      // Finish
+      break;
     }
   }
 
@@ -218,7 +195,7 @@ InterruptManager::InterruptManager() {
   InterruptMasterEnable& ime{InterruptMasterEnable::Instance()};
   ime.Disable();
 
-  // Clear interrupt table (just in case)
+  // Clear interrupt table (with sentinel).
   memset32(kIsrTable.data(), 0, (kIsrTable.size() + 1) * sizeof(IrqRec) / 4);
 
   // TODO: support custom isr
@@ -237,14 +214,9 @@ InterruptManager& InterruptManager::DisableInterrupt(Interrupt interrupt) {
   return *this;
 }
 
-InterruptManager& InterruptManager::AddInterruptHandler(Interrupt interrupt, Fnptr arm_handler) {
-  AddIrq(interrupt, arm_handler);
-  return *this;
-}
-
-InterruptManager& InterruptManager::ReplaceInterruptHandler(Interrupt interrupt,
-                                                            Fnptr arm_handler) {
-  ReplaceIrq(interrupt, arm_handler);
+InterruptManager& InterruptManager::SetInterruptHandler(Interrupt interrupt,
+                                                        Fnptr handler TONCAR_NONNULL) {
+  SetIrq(interrupt, handler);
   return *this;
 }
 

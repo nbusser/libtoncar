@@ -4,6 +4,8 @@
 
 #include <cstdint>
 
+#include "attributes.h"
+
 namespace toncar {
 
 enum class Interrupt : uint8_t {
@@ -19,9 +21,7 @@ class InterruptManager {
 
   InterruptManager& DisableInterrupt(Interrupt interrupt);
 
-  InterruptManager& AddInterruptHandler(Interrupt interrupt, Fnptr arm_handler);
-
-  InterruptManager& ReplaceInterruptHandler(Interrupt interrupt, Fnptr arm_handler);
+  InterruptManager& SetInterruptHandler(Interrupt interrupt, Fnptr handler TONCAR_NONNULL);
 
   InterruptManager& DeleteInterruptHandler(Interrupt interrupt);
 
