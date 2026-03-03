@@ -19,7 +19,7 @@ bazel_dep(name = "rules_shell", version = "0.6.1")
 bazel_dep(name = "wolfd_bazel_compile_commands", version = "0.5.2", dev_dependency = True)
 
 # --------------------------------------------------------------------------------------------------
-# MARK: Toolchains
+# MARK: Rust
 
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(
@@ -27,6 +27,17 @@ rust.toolchain(
     versions = ["1.85.0"],
 )
 use_repo(rust, "rust_toolchains")
+
+crate = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
+crate.from_cargo(
+    name = "crates",
+    cargo_lockfile = "//libtoncar/gfx_converter:Cargo.lock",
+    manifests = ["//libtoncar/gfx_converter:Cargo.toml"],
+)
+use_repo(crate, "crates")
+
+# --------------------------------------------------------------------------------------------------
+# MARK: Toolchains
 
 register_toolchains(
     "//platform:toolchain",

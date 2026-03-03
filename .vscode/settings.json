@@ -4,8 +4,13 @@
     "--query-driver=**",
     "--compile-commands-dir=${workspaceFolder}"
   ],
+  "rust-analyzer.linkedProjects": [
+    "${workspaceFolder}/libtoncar/gfx_converter/Cargo.toml"
+  ],
   "cSpell.words": [
     "archiver",
+    "asefile",
+    "Aseprite",
     "asminc",
     "autofdo",
     "bitcode",

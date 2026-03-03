@@ -3,7 +3,7 @@
 BAZEL?=bazel
 QUERY?=//example:game
 CLANG_TIDY?=clang-tidy
-SOURCES:=$(shell find src -name "*.cpp")
+SOURCES:=$(shell find example -name "*.cpp")
 
 .clangd:
 	tools/clangd/gen_clangd.sh
