@@ -17,6 +17,7 @@ cc_library(
         "registers/display.h",
         "registers/registers.h",
         "screen.h",
+        "sprite.h",
         "toncar.h",
     ],
     copts = CXXOPTS,
