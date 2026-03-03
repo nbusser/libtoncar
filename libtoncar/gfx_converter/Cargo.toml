@@ -5,5 +5,9 @@ authors = [""]
 edition = "2024"
 
 [dependencies]
+image = { version = "0.24", default-features = false, features = [
+    "png",
+    "bmp",
+] }
 asefile = "0.3.8"
 
