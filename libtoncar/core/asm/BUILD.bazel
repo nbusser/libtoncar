@@ -12,7 +12,7 @@ cc_library(
         "memset.h",
     ],
     visibility = [
-        "//src/libtoncar:__pkg__",
+        "//libtoncar/core:__pkg__",
     ],
-    deps = ["//src/libtoncar/asm/internal"],
+    deps = ["//libtoncar/core/asm/internal"],
 )

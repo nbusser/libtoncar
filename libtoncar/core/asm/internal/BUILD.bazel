@@ -20,5 +20,5 @@ cc_library(
         "-x",
         "assembler-with-cpp",
     ],
-    visibility = ["//src/libtoncar/asm:__pkg__"],
+    visibility = ["//libtoncar/core/asm:__pkg__"],
 )

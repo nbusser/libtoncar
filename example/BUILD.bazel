@@ -8,9 +8,9 @@ cc_binary(
     additional_linker_inputs = ["@//platform:gba_specs"],
     copts = CXXOPTS,
     linkopts = ["-specs=$(location @//platform:gba_specs)"],
-    visibility = ["//src:__pkg__"],
+    visibility = ["//examples:__pkg__"],
     deps = [
-        "//src/libtoncar",
+        "//libtoncar",
     ],
 )
 

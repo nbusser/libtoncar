@@ -1,9 +1,10 @@
 load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 
 # TODO: build mgba via bazel
+# TODO: improve to pass any rom
 sh_binary(
     name = "run_rom",
     srcs = ["mgba_wrapper.sh"],
-    args = ["$(location //src:game)"],
-    data = ["//src:game"],
+    args = ["$(location //example:game)"],
+    data = ["//example:game"],
 )

@@ -1,0 +1,9 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "libtoncar",
+    include_prefix = "libtoncar",
+    strip_include_prefix = "libtoncar/core",
+    visibility = ["//visibility:public"],
+    deps = ["//libtoncar/core"],
+)
