@@ -1,12 +1,23 @@
 use asefile::{AsepriteFile, Tag};
-use image::DynamicImage;
+use image::{DynamicImage, GenericImageView, Pixel};
 use std::{
     collections::HashMap,
     env::{self},
+    error::Error,
+    fmt,
     hash::{Hash, Hasher},
     path::Path,
     result,
 };
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum GfxConverterError {
+    #[error("Palette already contains 16 colors")]
+    MaxColorReached,
+    #[error("Invalid sprite dimensions")]
+    InvalidImageSize,
+}
 
 #[derive(Clone, Copy)]
 pub struct Color {
@@ -63,7 +74,7 @@ impl Palette16 {
         }
     }
 
-    pub fn get_color_index(&mut self, color: Color) -> Result<u8, ()> {
+    pub fn get_color_index(&mut self, color: Color) -> Result<u8, GfxConverterError> {
         if color.is_transparent() {
             return Ok(0);
         }
@@ -72,7 +83,7 @@ impl Palette16 {
             return Ok(*index);
         }
         if self.color_to_index.len() == (MAX_COLORS_PER_PALETTE - 1) {
-            return Err(());
+            return Err(GfxConverterError::MaxColorReached);
         }
         let index = (self.color_to_index.len() + 1) as u8;
         self.color_to_index.insert(color, index);
@@ -91,7 +102,112 @@ impl Palette16 {
 struct ParsedAsepriteFile {
     frames: Vec<DynamicImage>,
     tags: Vec<Tag>,
-    palette: Palette16,
+}
+
+fn valid_sprite_size(width: u32, height: u32) -> bool {
+    match (width, height) {
+        (8, 8) => true,
+        (16, 16) => true,
+        (32, 32) => true,
+        (64, 64) => true,
+        (16, 8) => true,
+        (32, 8) => true,
+        (32, 16) => true,
+        (64, 32) => true,
+        (8, 16) => true,
+        (8, 32) => true,
+        (16, 32) => true,
+        (32, 64) => true,
+        (_, _) => false,
+    }
+}
+
+struct Sprite {
+    pub data: Vec<Color>,
+    pub size: (u8, u8),
+}
+
+impl Sprite {
+    pub fn new(image: DynamicImage) -> Result<Self, GfxConverterError> {
+        if !valid_sprite_size(image.width(), image.height()) {
+            return Err(GfxConverterError::InvalidImageSize);
+        }
+
+        // Store image from top-left corner
+        let mut pixels: Vec<Color> = Vec::with_capacity((image.width() * image.height()) as usize);
+        for y in 0..image.height() {
+            for x in 0..image.width() {
+                let rgba = image.get_pixel(x, y).to_rgba();
+                pixels.push(Color::from_rgb(rgba[0], rgba[1], rgba[2], rgba[3]));
+            }
+        }
+        Ok(Sprite {
+            data: pixels,
+            size: (image.width() as u8, image.height() as u8),
+        })
+    }
+}
+
+const TILE_WIDTH: u8 = 8;
+
+struct TiledSprite {
+    data: Vec<[u8; (TILE_WIDTH * TILE_WIDTH) as usize]>,
+    size: (u8, u8),
+}
+
+impl TiledSprite {
+    pub fn new(sprite: Sprite, palette: &mut Palette16) -> Result<Self, GfxConverterError> {
+        let n_tiles_x = sprite.size.0 / TILE_WIDTH;
+        let n_tiles_y = sprite.size.1 / TILE_WIDTH;
+
+        let mut palette_color_indexes: Vec<[u8; (TILE_WIDTH * TILE_WIDTH) as usize]> =
+            Vec::with_capacity((n_tiles_x * n_tiles_y) as usize);
+
+        for tile_y in 0..n_tiles_y {
+            for tile_x in 0..n_tiles_x {
+                let mut tile_data = [0u8; (TILE_WIDTH * TILE_WIDTH) as usize];
+
+                for y in 0..TILE_WIDTH {
+                    for x in 0..TILE_WIDTH {
+                        let pixel_x = tile_x * TILE_WIDTH + x;
+                        let pixel_y = tile_y * TILE_WIDTH + y;
+
+                        let sprite_width = sprite.size.0 as usize;
+                        let offset = pixel_y as usize * sprite_width + pixel_x as usize;
+
+                        let color = sprite.data[offset];
+
+                        let index = palette.get_color_index(color)?;
+
+                        let pixel_offset = (y * TILE_WIDTH + x) as usize;
+                        tile_data[pixel_offset] = index;
+                    }
+                }
+
+                palette_color_indexes.push(tile_data);
+            }
+        }
+
+        Ok(TiledSprite {
+            data: palette_color_indexes,
+            size: sprite.size,
+        })
+    }
+}
+
+fn build_palette_and_sprites_from_file(
+    images: Vec<DynamicImage>,
+) -> Result<(Palette16, Vec<TiledSprite>), GfxConverterError> {
+    let mut palette = Palette16::new();
+    let mut sprites = Vec::new();
+
+    for image in images {
+        let sprite = Sprite::new(image)?;
+        let tiled = TiledSprite::new(sprite, &mut palette)?;
+        sprites.push(tiled);
+    }
+
+    Ok((palette, sprites))
 }
 
 fn parse_aseprite_file(
@@ -104,7 +220,6 @@ fn parse_aseprite_file(
 
     for frame in 0..ase.num_frames() {
         let image = ase.frame(frame).image();
-
         images.push(DynamicImage::ImageRgba8(image))
     }
 
@@ -121,25 +236,23 @@ fn main() {
         std::process::exit(1);
     }
 
-    let parsed_aseprite_files: Vec<(
-        String,
-        Result<(Vec<DynamicImage>, Vec<Tag>), Box<dyn std::error::Error>>,
-    )> = env::args()
+    let parsed_aseprite_files: Vec<(String, Palette16, Vec<TiledSprite>, Vec<Tag>)> = env::args()
         .skip(1)
-        .map(|filepath| (filepath.clone(), parse_aseprite_file(Path::new(&filepath))))
+        .filter_map(|filepath| match parse_aseprite_file(Path::new(&filepath)) {
+            Ok((images, tags)) => Some((filepath, images, tags)),
+            Err(err) => {
+                eprintln!("Error parsing {}: {}", filepath, err);
+                std::process::exit(1);
+            }
+        })
+        .map(
+            |(filepath, images, tags)| match build_palette_and_sprites_from_file(images) {
+                Ok((palette, sprites)) => (filepath, palette, sprites, tags),
+                Err(err) => {
+                    eprintln!("Error parsing {}: {}", filepath, err);
+                    std::process::exit(1);
+                }
+            },
+        )
         .collect();
-
-    let (_parsed, errs): (Vec<_>, Vec<_>) = parsed_aseprite_files
-        .into_iter()
-        .partition(|(_, res)| res.is_ok());
-
-    if errs.len() > 0 {
-        eprintln!("Parsing errors:");
-        errs.iter().for_each(|(filepath, error)| {
-            eprintln!("File {}: \"{}\"", filepath, error.as_ref().unwrap_err());
-        });
-        std::process::exit(1);
-    }
-
-    ()
 }

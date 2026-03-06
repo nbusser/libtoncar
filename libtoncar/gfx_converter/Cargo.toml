@@ -10,4 +10,5 @@ image = { version = "0.24", default-features = false, features = [
     "bmp",
 ] }
 asefile = "0.3.8"
+thiserror = "2.0.18"
 
