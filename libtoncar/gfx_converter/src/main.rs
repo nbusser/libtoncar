@@ -1,10 +1,12 @@
 use asefile::{AsepriteFile, Tag};
+use heck::ToSnakeCase;
 use image::{DynamicImage, GenericImageView, Pixel};
+use minijinja::{Environment, context};
 use std::{
     collections::HashMap,
     env::{self},
     error::Error,
-    fmt,
+    fmt, fs,
     hash::{Hash, Hasher},
     path::Path,
     result,
@@ -193,6 +195,16 @@ impl TiledSprite {
             size: sprite.size,
         })
     }
+
+    pub fn to_4bpp(&self) -> Vec<u8> {
+        self.data
+            .iter()
+            .flat_map(|tile| {
+                tile.chunks_exact(2)
+                    .map(|p| (p[0] & 0xF) | ((p[1] & 0xF) << 4))
+            })
+            .collect()
+    }
 }
 
 fn build_palette_and_sprites_from_file(
@@ -230,6 +242,54 @@ fn parse_aseprite_file(
     Ok((images, tags))
 }
 
+fn sanitize_filename(filename: String) -> String {
+    let s: String = filename
+        .chars()
+        .map(|c| if c.is_ascii_alphanumeric() { c } else { '_' })
+        .collect();
+    s.to_snake_case()
+}
+
+fn generate_cpp(filepath: &String, palette: &Palette16, sprites: &Vec<TiledSprite>) {
+    let raw_filename = Path::new(&filepath)
+        .file_stem()
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_owned();
+    let filename = sanitize_filename(raw_filename);
+
+    let template = include_str!("sprite.cpp.j2");
+
+    let mut env = Environment::new();
+    env.add_template("sprite", template).unwrap();
+
+    let tmpl = env.get_template("sprite").unwrap();
+
+    let output = tmpl
+        .render(context! {
+            filename => filename,
+            palette_name => filename + "_palette",
+            palette_colors => palette.get_colors().map(|color| {
+                context! {
+                    rgb15 => color.to_rgb15(),
+                    type => "int",
+                }
+            }),
+            sprites => sprites.iter().map(|sprite| {
+                context! {
+                    name => "todo",
+                    values => sprite.to_4bpp(),
+                    size_x => sprite.size.0,
+                    size_y => sprite.size.1
+                }
+            }).collect::<Vec<_>>()
+        })
+        .unwrap();
+
+    fs::write("sprite.cpp", output).unwrap();
+}
+
 fn main() {
     if env::args().len() < 2 {
         eprintln!("Usage: converter <aseprite filepaths>");
@@ -254,5 +314,12 @@ fn main() {
                 }
             },
         )
+        .collect();
+
+    let _: Vec<_> = parsed_aseprite_files
+        .iter()
+        .map(|(filepath, palette, sprites, tags)| {
+            generate_cpp(filepath, palette, sprites);
+        })
         .collect();
 }

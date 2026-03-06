@@ -1,0 +1,28 @@
+#pragma once
+
+#include <array>
+#include <cstdint>
+#include <span>
+#include "libtoncar/sprite.h"
+
+namespace libtoncar::sprites::{{ filename }} {
+
+constexpr Palette16 {{ palette_name }}{
+{%- for color in palette_colors -%}
+    {{"0x%04X"|format(color.rgb15)}}{% if not loop.last %},{% endif %}
+{%- endfor -%}
+};
+
+{% for sprite in sprites %}
+constexpr std::array<uint8_t, {{ sprite.values | length }}> {{sprite.name}}_data{
+    {%- for value in sprite.values -%}
+        {{"0x%02X"|format(value)}}{% if not loop.last %},{% endif %}
+    {%- endfor -%}
+};
+
+constexpr Sprite {{ sprite.name }}{
+    {{palette_name}}, std::span<const uint8_t>{ {{sprite.name}}_data }, Sprite::Size::S{{sprite.size_x}}x{{sprite.size_y}}
+};
+{% endfor %}
+
+}

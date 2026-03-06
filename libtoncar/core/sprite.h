@@ -4,18 +4,11 @@
 
 #include <array>
 #include <cstdint>
+#include <span>
 
 namespace toncar {
 
-class Palette16 {
- public:
-  constexpr Palette16(std::array<Color15, 16> colors) : colors_{colors} {
-    static_cast<void>(colors_);
-  }
-
- private:
-  std::array<Color15, 16> colors_;
-};
+using Palette16 = std::array<std::uint16_t, 16>;
 
 class Sprite {
  public:
@@ -35,7 +28,7 @@ class Sprite {
     S16x32 = 0b1010,
   };
 
-  constexpr Sprite(const Palette16& palette, const uint8_t* data, Size size)
+  constexpr Sprite(const Palette16& palette, std::span<const uint8_t> data, Size size)
       : palette_{&palette}, data_{data}, size_{size} {
     static_cast<void>(palette_);
     static_cast<void>(data_);
@@ -46,7 +39,7 @@ class Sprite {
   /// Stored in ROM. Lifetime static.
   const Palette16* palette_;
   /// Stored in ROM. Lifetime static.
-  const uint8_t* data_;
+  const std::span<const uint8_t> data_;
   Size size_;
 };
 
