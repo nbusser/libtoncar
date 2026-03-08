@@ -3,41 +3,43 @@
 #include <span>
 
 #include "libtoncar/sprite.h"
-#include "{{filename}}.h"
+#include "{{ filename }}.h"
 
 namespace toncar::sprites::{{ filename }} {
 
 namespace {
+
 constexpr Palette16 {{ filename }}_palette{
-{%- for color in palette_colors -%}
-    {{"0x%04X"|format(color.rgb15)}}{% if not loop.last %},{% endif %}
-{%- endfor -%}
+{% for color in palette_colors -%}
+    {{ "0x%04X"|format(color.rgb15) }}{% if not loop.last %},{% endif %}
+{% endfor -%}
 };
-
 {% for tag in tags %}
-namespace frames::{{tag.name}} {
-
+namespace {{ tag.name }} {
 {% for sprite in tag.sprites %}
-constexpr std::array<uint8_t, {{ sprite.values | length }}> frame_{{loop.index0}}_data{
-    {%- for value in sprite.values -%}
-        {{"0x%02X"|format(value)}}{% if not loop.last %},{% endif %}
-    {%- endfor -%}
+constexpr std::array<uint8_t, {{ sprite.values | length }}> frame_{{ loop.index0 }}_data{
+{% for value in sprite.values -%}
+    {{ "0x%02X"|format(value) }}{% if not loop.last %},{% endif %}
+{% endfor -%}
 };
 {% endfor %}
-
 constexpr std::array<Sprite, {{ tag.sprites | length }}> sprite_frames{
-{% for sprite in tag.sprites %}
-Sprite{ {{filename}}_palette, std::span<const uint8_t>{ frame_{{loop.index0}}_data }, Sprite::Size::S{{sprite.size_x}}x{{sprite.size_y}} }{% if not loop.last %},{% endif %}
-{% endfor %}
+{%- for sprite in tag.sprites -%}
+    Sprite{
+        {{ filename }}_palette,
+        std::span<const uint8_t>{frame_{{ loop.index0 }}_data},
+        Sprite::Size::S{{ sprite.size_x }}x{{ sprite.size_y }}
+    }{% if not loop.last %},{% endif %}
+{% endfor -%}
 };
 
-}
-
-{% endfor %}
-}
-
+}  // namespace frames::{{ tag.name }}
+{% endfor -%}
+}  // namespace
 {% for tag in tags %}
-Tag {{tag.name}}{std::span<const Sprite>{ frames::{{tag.name}}::sprite_frames } };
-{% endfor %}
+Tag {{ tag.name }}{
+    std::span<const Sprite>{{ '{' }}{{ tag.name }}::sprite_frames}
+};
+{% endfor -%}
 
-}
+}  // namespace toncar::sprites::{{ filename }}

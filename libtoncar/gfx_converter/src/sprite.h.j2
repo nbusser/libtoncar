@@ -4,8 +4,7 @@
 
 namespace toncar::sprites::{{ filename }} {
 
-{% for tag in tags %}
+{% for tag in tags -%}
 extern Tag {{tag.name}};
 {% endfor %}
-
-}
+}  // namespace toncar::sprites::{{ filename }}
