@@ -45,10 +45,10 @@ class Sprite {
 
 class Tag {
  public:
-  Tag(std::span<const Sprite*> sprites) : sprites_(sprites) {}
+  Tag(std::span<const Sprite> sprites) : sprites_(sprites) {}
 
  private:
-  const std::span<const Sprite*> sprites_;
+  const std::span<const Sprite> sprites_;
   // TODO: direction
 };
 

@@ -3,7 +3,18 @@ load("@rules_rust//rust:defs.bzl", "rust_binary")
 
 rust_binary(
     name = "gfx_converter",
-    srcs = ["src/main.rs"],
+    srcs = [
+        "src/aseprite.rs",
+        "src/codegen.rs",
+        "src/color.rs",
+        "src/error.rs",
+        "src/main.rs",
+        "src/sprite.rs",
+    ],
+    compile_data = [
+        "src/sprite.cpp.j2",
+        "src/sprite.h.j2",
+    ],
     visibility = ["//visibility:public"],
     deps = all_crate_deps(normal = True),
 )

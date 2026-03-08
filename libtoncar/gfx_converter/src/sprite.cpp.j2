@@ -1,5 +1,3 @@
-#pragma once
-
 #include <array>
 #include <cstdint>
 #include <span>
@@ -7,7 +5,7 @@
 #include "libtoncar/sprite.h"
 #include "{{filename}}.h"
 
-namespace libtoncar::sprites::{{ filename }} {
+namespace toncar::sprites::{{ filename }} {
 
 namespace {
 constexpr Palette16 {{ filename }}_palette{
@@ -17,7 +15,7 @@ constexpr Palette16 {{ filename }}_palette{
 };
 
 {% for tag in tags %}
-namespace {{tag.name}} {
+namespace frames::{{tag.name}} {
 
 {% for sprite in tag.sprites %}
 constexpr std::array<uint8_t, {{ sprite.values | length }}> frame_{{loop.index0}}_data{
@@ -39,7 +37,7 @@ Sprite{ {{filename}}_palette, std::span<const uint8_t>{ frame_{{loop.index0}}_da
 }
 
 {% for tag in tags %}
-constexpr Tag {{tag.name}}{std::span<const Sprite*>{ {{tag.name}}::sprite_frames } };
+Tag {{tag.name}}{std::span<const Sprite>{ frames::{{tag.name}}::sprite_frames } };
 {% endfor %}
 
 }

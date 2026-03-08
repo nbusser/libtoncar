@@ -52,6 +52,7 @@ fn render(template_str: &str, ctx: &minijinja::Value) -> Result<String, GfxConve
 
 pub fn generate(
     filepath: &str,
+    out_dir: &str,
     palette: &Palette16,
     grouped: &[(Tag, Vec<TiledSprite>)],
 ) -> Result<(), GfxConverterError> {
@@ -69,8 +70,9 @@ pub fn generate(
         (format!("{filename}.h"), include_str!("sprite.h.j2")),
     ];
 
-    for (output_path, template_str) in files {
+    for (output_filename, template_str) in files {
         let output = render(template_str, &ctx)?;
+        let output_path = Path::new(out_dir).join(&output_filename);
         fs::write(output_path, output)?;
     }
 

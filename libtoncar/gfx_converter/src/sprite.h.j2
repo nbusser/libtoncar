@@ -2,10 +2,10 @@
 
 #include "libtoncar/sprite.h"
 
-namespace libtoncar::sprites::{{ filename }} {
+namespace toncar::sprites::{{ filename }} {
 
 {% for tag in tags %}
-constexpr Tag {{tag.name}};
+extern Tag {{tag.name}};
 {% endfor %}
 
 }

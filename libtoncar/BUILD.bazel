@@ -5,5 +5,7 @@ cc_library(
     include_prefix = "libtoncar",
     strip_include_prefix = "libtoncar/core",
     visibility = ["//visibility:public"],
-    deps = ["//libtoncar/core"],
+    deps = [
+        "//libtoncar/core",
+    ],
 )
