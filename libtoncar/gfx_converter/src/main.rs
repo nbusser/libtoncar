@@ -263,80 +263,55 @@ fn sanitize_name(name: String) -> String {
     s.to_snake_case()
 }
 
+fn build_template_context<'a>(
+    filename: &'a str,
+    palette: &'a Palette16,
+    grouped: &'a Vec<(Tag, Vec<TiledSprite>)>,
+) -> minijinja::Value {
+    context! {
+        filename => filename,
+        palette_colors => palette.get_colors().map(|color| {
+            context! {
+                rgb15 => color.to_rgb15(),
+                type => "int",
+            }
+        }),
+        tags => grouped.iter().map(|(tag, sprites)| {
+            context! {
+                name => sanitize_name(tag.name().to_string()),
+                sprites => sprites.iter().map(|sprite| {
+                    context! {
+                        values => sprite.to_4bpp(),
+                        size_x => sprite.size.0,
+                        size_y => sprite.size.1
+                    }
+                }).collect::<Vec<_>>()
+            }
+        }).collect::<Vec<_>>()
+    }
+}
+
+fn render_template(template_str: &str, ctx: &minijinja::Value) -> String {
+    let mut env = Environment::new();
+    env.add_template("sprite", template_str).unwrap();
+    env.get_template("sprite").unwrap().render(ctx).unwrap()
+}
+
 fn generate_cpp(filepath: &String, palette: &Palette16, grouped: &Vec<(Tag, Vec<TiledSprite>)>) {
-    let raw_filename = Path::new(&filepath)
-        .file_stem()
-        .unwrap()
-        .to_str()
-        .unwrap()
-        .to_owned();
-    let filename = sanitize_name(raw_filename);
+    let raw_filename = Path::new(&filepath).file_stem().unwrap().to_str().unwrap();
+    let filename = sanitize_name(raw_filename.to_string());
 
-    let template_cpp = include_str!("sprite.cpp.j2");
+    let ctx = build_template_context(&filename, palette, grouped);
 
-    let mut env = Environment::new();
-    env.add_template("sprite", template_cpp).unwrap();
+    let files = [
+        (filename.to_owned() + ".cpp", include_str!("sprite.cpp.j2")),
+        (filename.to_owned() + ".h", include_str!("sprite.h.j2")),
+    ];
 
-    let output_cpp = env
-        .get_template("sprite")
-        .unwrap()
-        .render(context! {
-            filename => filename,
-            palette_colors => palette.get_colors().map(|color| {
-                context! {
-                    rgb15 => color.to_rgb15(),
-                    type => "int",
-                }
-            }),
-            tags => grouped.iter().map(|(tag, sprites)| {
-                context! {
-                    name => sanitize_name(tag.name().to_string()),
-                    sprites => sprites.iter().map(|sprite| {
-                        context! {
-                            values => sprite.to_4bpp(),
-                            size_x => sprite.size.0,
-                            size_y => sprite.size.1
-                        }
-                    }).collect::<Vec<_>>()
-                }
-            }).collect::<Vec<_>>()
-        })
-        .unwrap();
-
-    fs::write("sprite.cpp", output_cpp).unwrap();
-
-    let template_h = include_str!("sprite.h.j2");
-
-    let mut env = Environment::new();
-    env.add_template("sprite", template_h).unwrap();
-
-    let output_h = env
-        .get_template("sprite")
-        .unwrap()
-        .render(context! {
-            filename => filename,
-            palette_colors => palette.get_colors().map(|color| {
-                context! {
-                    rgb15 => color.to_rgb15(),
-                    type => "int",
-                }
-            }),
-            tags => grouped.iter().map(|(tag, sprites)| {
-                context! {
-                    name => sanitize_name(tag.name().to_string()),
-                    sprites => sprites.iter().map(|sprite| {
-                        context! {
-                            values => sprite.to_4bpp(),
-                            size_x => sprite.size.0,
-                            size_y => sprite.size.1
-                        }
-                    }).collect::<Vec<_>>()
-                }
-            }).collect::<Vec<_>>()
-        })
-        .unwrap();
-
-    fs::write("sprite.h", output_h).unwrap();
+    for (output_path, template_str) in files {
+        let output = render_template(template_str, &ctx);
+        fs::write(output_path, output).unwrap();
+    }
 }
 
 fn main() {
