@@ -7,6 +7,7 @@
 
 namespace libtoncar::sprites::{{ filename }} {
 
+namespace {
 constexpr Palette16 {{ filename }}_palette{
 {%- for color in palette_colors -%}
     {{"0x%04X"|format(color.rgb15)}}{% if not loop.last %},{% endif %}
@@ -32,8 +33,11 @@ Sprite{ {{filename}}_palette, std::span<const uint8_t>{ frame_{{loop.index0}}_da
 
 }
 
-Tag {{tag.name}}{std::span<const Sprite*>{ {{tag.name}}::sprite_frames } };
+{% endfor %}
+}
 
+{% for tag in tags %}
+constexpr Tag {{tag.name}}{std::span<const Sprite*>{ {{tag.name}}::sprite_frames } };
 {% endfor %}
 
 }

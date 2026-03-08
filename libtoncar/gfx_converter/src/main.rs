@@ -272,14 +272,14 @@ fn generate_cpp(filepath: &String, palette: &Palette16, grouped: &Vec<(Tag, Vec<
         .to_owned();
     let filename = sanitize_name(raw_filename);
 
-    let template = include_str!("sprite.cpp.j2");
+    let template_cpp = include_str!("sprite.cpp.j2");
 
     let mut env = Environment::new();
-    env.add_template("sprite", template).unwrap();
+    env.add_template("sprite", template_cpp).unwrap();
 
-    let tmpl = env.get_template("sprite").unwrap();
-
-    let output = tmpl
+    let output_cpp = env
+        .get_template("sprite")
+        .unwrap()
         .render(context! {
             filename => filename,
             palette_colors => palette.get_colors().map(|color| {
@@ -303,7 +303,40 @@ fn generate_cpp(filepath: &String, palette: &Palette16, grouped: &Vec<(Tag, Vec<
         })
         .unwrap();
 
-    fs::write("sprite.cpp", output).unwrap();
+    fs::write("sprite.cpp", output_cpp).unwrap();
+
+    let template_h = include_str!("sprite.h.j2");
+
+    let mut env = Environment::new();
+    env.add_template("sprite", template_h).unwrap();
+
+    let output_h = env
+        .get_template("sprite")
+        .unwrap()
+        .render(context! {
+            filename => filename,
+            palette_colors => palette.get_colors().map(|color| {
+                context! {
+                    rgb15 => color.to_rgb15(),
+                    type => "int",
+                }
+            }),
+            tags => grouped.iter().map(|(tag, sprites)| {
+                context! {
+                    name => sanitize_name(tag.name().to_string()),
+                    sprites => sprites.iter().map(|sprite| {
+                        context! {
+                            values => sprite.to_4bpp(),
+                            size_x => sprite.size.0,
+                            size_y => sprite.size.1
+                        }
+                    }).collect::<Vec<_>>()
+                }
+            }).collect::<Vec<_>>()
+        })
+        .unwrap();
+
+    fs::write("sprite.h", output_h).unwrap();
 }
 
 fn main() {

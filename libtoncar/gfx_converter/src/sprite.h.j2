@@ -1,0 +1,14 @@
+#pragma once
+
+#include <array>
+#include <cstdint>
+#include <span>
+#include "libtoncar/sprite.h"
+
+namespace libtoncar::sprites::{{ filename }} {
+
+{% for tag in tags %}
+constexpr Tag {{tag.name}};
+{% endfor %}
+
+}
