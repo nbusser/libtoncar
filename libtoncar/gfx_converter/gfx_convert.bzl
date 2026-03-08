@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-def gfx_sprites(name, srcs, copts = [], deps = [], **kwargs):
+def gfx_sprites(name, srcs, copts = [], **kwargs):
     generated_srcs = []
     generated_hdrs = []
 
@@ -28,6 +28,6 @@ def gfx_sprites(name, srcs, copts = [], deps = [], **kwargs):
         srcs = generated_srcs,
         hdrs = generated_hdrs,
         copts = copts,
-        deps = deps,
+        deps = ["//libtoncar"],
         **kwargs
     )

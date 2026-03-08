@@ -4,5 +4,4 @@ gfx_sprites(
     name = "example_sprites",
     srcs = ["example.ase"],
     visibility = ["//visibility:public"],
-    deps = ["//libtoncar"],
 )
