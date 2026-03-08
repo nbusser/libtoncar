@@ -5,11 +5,9 @@ use minijinja::{Environment, context};
 use std::{
     collections::HashMap,
     env::{self},
-    error::Error,
-    fmt, fs,
+    fs,
     hash::{Hash, Hasher},
     path::Path,
-    result,
 };
 use thiserror::Error;
 
@@ -99,11 +97,6 @@ impl Palette16 {
         }
         color_array
     }
-}
-
-struct ParsedAsepriteFile {
-    frames: Vec<DynamicImage>,
-    tags: Vec<Tag>,
 }
 
 fn valid_sprite_size(width: u32, height: u32) -> bool {
@@ -208,18 +201,23 @@ impl TiledSprite {
 }
 
 fn build_palette_and_sprites_from_file(
-    images: Vec<DynamicImage>,
-) -> Result<(Palette16, Vec<TiledSprite>), GfxConverterError> {
+    grouped: Vec<(Tag, Vec<DynamicImage>)>,
+) -> Result<(Palette16, Vec<(Tag, Vec<TiledSprite>)>), GfxConverterError> {
     let mut palette = Palette16::new();
-    let mut sprites = Vec::new();
+    let mut grouped_result = Vec::with_capacity(grouped.len());
 
-    for image in images {
-        let sprite = Sprite::new(image)?;
-        let tiled = TiledSprite::new(sprite, &mut palette)?;
-        sprites.push(tiled);
+    for (tag, images) in grouped {
+        let mut sprites = Vec::new();
+
+        for image in images {
+            let sprite = Sprite::new(image)?;
+            let tiled = TiledSprite::new(sprite, &mut palette)?;
+            sprites.push(tiled);
+        }
+        grouped_result.push((tag, sprites));
     }
 
-    Ok((palette, sprites))
+    Ok((palette, grouped_result))
 }
 
 fn parse_aseprite_file(
@@ -242,22 +240,37 @@ fn parse_aseprite_file(
     Ok((images, tags))
 }
 
-fn sanitize_filename(filename: String) -> String {
-    let s: String = filename
+fn regroup_images_by_tag(
+    images: Vec<DynamicImage>,
+    tags: Vec<Tag>,
+) -> Vec<(Tag, Vec<DynamicImage>)> {
+    tags.into_iter()
+        .map(|tag| {
+            let imgs = (tag.from_frame()..=tag.to_frame())
+                .map(|i| images[i as usize].clone())
+                .collect();
+
+            (tag, imgs)
+        })
+        .collect()
+}
+
+fn sanitize_name(name: String) -> String {
+    let s: String = name
         .chars()
         .map(|c| if c.is_ascii_alphanumeric() { c } else { '_' })
         .collect();
     s.to_snake_case()
 }
 
-fn generate_cpp(filepath: &String, palette: &Palette16, sprites: &Vec<TiledSprite>) {
+fn generate_cpp(filepath: &String, palette: &Palette16, grouped: &Vec<(Tag, Vec<TiledSprite>)>) {
     let raw_filename = Path::new(&filepath)
         .file_stem()
         .unwrap()
         .to_str()
         .unwrap()
         .to_owned();
-    let filename = sanitize_filename(raw_filename);
+    let filename = sanitize_name(raw_filename);
 
     let template = include_str!("sprite.cpp.j2");
 
@@ -269,19 +282,22 @@ fn generate_cpp(filepath: &String, palette: &Palette16, sprites: &Vec<TiledSprit
     let output = tmpl
         .render(context! {
             filename => filename,
-            palette_name => filename + "_palette",
             palette_colors => palette.get_colors().map(|color| {
                 context! {
                     rgb15 => color.to_rgb15(),
                     type => "int",
                 }
             }),
-            sprites => sprites.iter().map(|sprite| {
+            tags => grouped.iter().map(|(tag, sprites)| {
                 context! {
-                    name => "todo",
-                    values => sprite.to_4bpp(),
-                    size_x => sprite.size.0,
-                    size_y => sprite.size.1
+                    name => sanitize_name(tag.name().to_string()),
+                    sprites => sprites.iter().map(|sprite| {
+                        context! {
+                            values => sprite.to_4bpp(),
+                            size_x => sprite.size.0,
+                            size_y => sprite.size.1
+                        }
+                    }).collect::<Vec<_>>()
                 }
             }).collect::<Vec<_>>()
         })
@@ -296,30 +312,30 @@ fn main() {
         std::process::exit(1);
     }
 
-    let parsed_aseprite_files: Vec<(String, Palette16, Vec<TiledSprite>, Vec<Tag>)> = env::args()
+    let parsed_aseprite_files: Vec<(String, Palette16, Vec<(Tag, Vec<TiledSprite>)>)> = env::args()
         .skip(1)
-        .filter_map(|filepath| match parse_aseprite_file(Path::new(&filepath)) {
-            Ok((images, tags)) => Some((filepath, images, tags)),
-            Err(err) => {
+        .map(|filepath| {
+            let (images, tags) = parse_aseprite_file(Path::new(&filepath)).unwrap_or_else(|err| {
                 eprintln!("Error parsing {}: {}", filepath, err);
                 std::process::exit(1);
-            }
-        })
-        .map(
-            |(filepath, images, tags)| match build_palette_and_sprites_from_file(images) {
-                Ok((palette, sprites)) => (filepath, palette, sprites, tags),
-                Err(err) => {
-                    eprintln!("Error parsing {}: {}", filepath, err);
+            });
+
+            let grouped = regroup_images_by_tag(images, tags);
+
+            let (palette, tag_sprites) = build_palette_and_sprites_from_file(grouped)
+                .unwrap_or_else(|error| {
+                    eprintln!("Error parsing {}: {}", filepath, error);
                     std::process::exit(1);
-                }
-            },
-        )
+                });
+
+            (filepath, palette, tag_sprites)
+        })
         .collect();
 
     let _: Vec<_> = parsed_aseprite_files
         .iter()
-        .map(|(filepath, palette, sprites, tags)| {
-            generate_cpp(filepath, palette, sprites);
+        .map(|(filepath, palette, grouped)| {
+            generate_cpp(filepath, palette, grouped);
         })
         .collect();
 }

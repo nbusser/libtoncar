@@ -43,4 +43,13 @@ class Sprite {
   Size size_;
 };
 
+class Tag {
+ public:
+  Tag(std::span<const Sprite*> sprites) : sprites_(sprites) {}
+
+ private:
+  const std::span<const Sprite*> sprites_;
+  // TODO: direction
+};
+
 }  // namespace toncar
