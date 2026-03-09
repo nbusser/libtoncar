@@ -38,7 +38,7 @@ constexpr std::array<Sprite, {{ tag.sprites | length }}> sprite_frames{
 }  // namespace
 {% for tag in tags %}
 Tag {{ tag.name }}{
-    std::span<const Sprite>{{ '{' }}{{ tag.name }}::sprite_frames}
+    std::span<const Sprite>{{ '{' }}{{ tag.name }}::sprite_frames}, Tag::Direction::{{ tag.direction }}
 };
 {% endfor -%}
 

@@ -1,4 +1,4 @@
-use asefile::Tag;
+use asefile::{AnimationDirection, Tag};
 use heck::ToSnakeCase;
 use minijinja::{Environment, context};
 use std::{fs, path::Path};
@@ -28,6 +28,11 @@ fn build_context<'a>(
         tags => grouped.iter().map(|(tag, sprites)| {
             context! {
                 name => sanitize_name(tag.name()),
+                direction => match tag.animation_direction() {
+                    AnimationDirection::Forward => "Forward",
+                    AnimationDirection::Reverse => "Reverse",
+                    AnimationDirection::PingPong => "PingPong",
+                },
                 sprites => sprites.iter().map(|sprite| {
                     context! {
                         values => sprite.to_4bpp(),

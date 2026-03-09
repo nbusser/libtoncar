@@ -45,10 +45,20 @@ class Sprite {
 
 class Tag {
  public:
-  Tag(std::span<const Sprite> sprites) : sprites_(sprites) {}
+  enum Direction {
+    Forward = 0,
+    Reverse = 1,
+    PingPong = 2,
+  };
+
+  Tag(std::span<const Sprite> sprites, Direction direction)
+      : sprites_{sprites}, direction_{direction} {
+    static_cast<void>(direction_);
+  }
 
  private:
   const std::span<const Sprite> sprites_;
+  const Direction direction_;
   // TODO: direction
 };
 
