@@ -31,12 +31,12 @@ class Sprite {
 
   constexpr Sprite(const Palette16& palette, std::span<const uint8_t> data, Size size)
       : palette_{&palette}, data_{data}, size_{size} {
-    static_cast<void>(palette_);
-    static_cast<void>(data_);
     static_cast<void>(size_);
   }
 
   [[nodiscard]] const Palette16* Palette() const { return palette_; }
+
+  [[nodiscard]] std::span<const uint8_t> Data() const { return data_; }
 
  private:
   /// Stored in ROM. Lifetime static.

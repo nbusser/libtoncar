@@ -1,11 +1,14 @@
 #include <asm/bios.h>
+#include <charblock.h>
 #include <palram.h>
+#include <sprite.h>
 
 #include <cstdint>
 #include <cstdlib>
 
 #include "example/assets/gfx/example.h"
 #include "interrupt_manager.h"
+#include "libtoncar/charblock.h"
 #include "libtoncar/colors.h"
 #include "libtoncar/palram.h"
 #include "libtoncar/registers/display.h"
@@ -43,7 +46,10 @@ int main() {
       .Mode3WritePixel(136, 80, colors15::kGreen)
       .Mode3WritePixel(120, 96, colors15::kBlue);
 
+  dispcnt.Reset().SetMode(Dispcnt::Mode::DcntMode0).SetLayer<Dispcnt::Layer::DcntBg2>();
+
   Palram::Instance().SpritesPalbank().LoadPalette(sprites::example::french.GetSprite(0).Palette());
+  Charblock(0x00010000).LoadTiles(sprites::example::french.GetSprite(0));
 
   while (true) {
     VBlankIntrWait();

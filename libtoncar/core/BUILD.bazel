@@ -10,6 +10,7 @@ cc_library(
     ],
     hdrs = [
         "attributes.h",
+        "charblock.h",
         "colors.h",
         "interrupt_manager.h",
         "mgba/logger.h",

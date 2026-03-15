@@ -14,15 +14,15 @@ class Palram final {
  private:
   class Palbank final {
    public:
-    constexpr explicit Palbank(uint16_t offset) : offset_{offset} {}
+    constexpr explicit Palbank(size_t offset) : offset_{offset} {}
 
     void LoadPalette(const Palette16* palette) const {
-      memcpy32(
-          reinterpret_cast<uint16_t*>(memory::kPalram) + offset_, palette, sizeof(Palette16) / 4);
+      memcpy32(reinterpret_cast<uint16_t*>(kBaseAddress + offset_), palette, sizeof(Palette16) / 4);
     }
 
    private:
-    uint16_t offset_;
+    static constexpr uintptr_t kBaseAddress{memory::kPalram};
+    size_t offset_;
   };
 
  public:
