@@ -12,12 +12,17 @@ namespace toncar {
 
 class Palram final {
  private:
-  template <uint16_t Offset>
-  class Palbank final : public Zone<Palbank<Offset>, uint16_t, memory::kPalram + Offset, 256> {
+  class Palbank final {
    public:
-    void LoadPalette(const Palette16* palette) {
-      memcpy32(const_cast<uint16_t*>(this->BaseAddress()), palette, sizeof(Palette16) / 4);
+    constexpr explicit Palbank(uint16_t offset) : offset_{offset} {}
+
+    void LoadPalette(const Palette16* palette) const {
+      memcpy32(
+          reinterpret_cast<uint16_t*>(memory::kPalram) + offset_, palette, sizeof(Palette16) / 4);
     }
+
+   private:
+    uint16_t offset_;
   };
 
  public:
@@ -26,14 +31,14 @@ class Palram final {
     return palram;
   }
 
-  Palbank<0x0000>& BackgroundsPalbank() { return backgrounds_palbank_; }
-  Palbank<0x0200>& SpritesPalbank() { return sprites_palbank_; }
+  Palbank& BackgroundsPalbank() { return backgrounds_palbank_; }
+  Palbank& SpritesPalbank() { return sprites_palbank_; }
 
  private:
-  Palbank<0x0000> backgrounds_palbank_{Palbank<0x0000>::Instance()};
-  Palbank<0x0200> sprites_palbank_{Palbank<0x0200>::Instance()};
-
   Palram() = default;
+
+  Palbank backgrounds_palbank_{Palbank(0x0000)};
+  Palbank sprites_palbank_{Palbank(0x0200)};
 };
 
 }  // namespace toncar
