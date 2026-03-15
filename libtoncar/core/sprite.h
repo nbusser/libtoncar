@@ -1,6 +1,7 @@
 #pragma once
 
 #include <colors.h>
+#include <panic.h>
 
 #include <array>
 #include <cstdint>
@@ -35,6 +36,8 @@ class Sprite {
     static_cast<void>(size_);
   }
 
+  [[nodiscard]] const Palette16* Palette() const { return palette_; }
+
  private:
   /// Stored in ROM. Lifetime static.
   const Palette16* palette_;
@@ -54,6 +57,11 @@ class Tag {
   Tag(std::span<const Sprite> sprites, Direction direction)
       : sprites_{sprites}, direction_{direction} {
     static_cast<void>(direction_);
+  }
+
+  [[nodiscard]] const Sprite& GetSprite(uint8_t index) const {
+    GBA_ASSERT(index < sprites_.size());
+    return sprites_[index];
   }
 
  private:

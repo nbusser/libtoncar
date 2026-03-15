@@ -89,6 +89,8 @@
     "objcopy",
     "objcpp",
     "objdump",
+    "Palbank",
+    "palram",
     "reent",
     "rtti",
     "skylib",

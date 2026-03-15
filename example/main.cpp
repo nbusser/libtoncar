@@ -1,10 +1,13 @@
 #include <asm/bios.h>
+#include <palram.h>
 
 #include <cstdint>
 #include <cstdlib>
 
+#include "example/assets/gfx/example.h"
 #include "interrupt_manager.h"
 #include "libtoncar/colors.h"
+#include "libtoncar/palram.h"
 #include "libtoncar/registers/display.h"
 #include "libtoncar/screen.h"
 #include "mgba/logger.h"
@@ -39,6 +42,8 @@ int main() {
   screen.Mode3WritePixel(120, 80, colors15::kRed)
       .Mode3WritePixel(136, 80, colors15::kGreen)
       .Mode3WritePixel(120, 96, colors15::kBlue);
+
+  Palram::Instance().SpritesPalbank().LoadPalette(sprites::example::french.GetSprite(0).Palette());
 
   while (true) {
     VBlankIntrWait();
