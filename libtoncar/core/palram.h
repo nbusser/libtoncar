@@ -16,7 +16,7 @@ class Palram final {
   class Palbank final : public Zone<Palbank<Offset>, uint16_t, memory::kPalram + Offset, 256> {
    public:
     void LoadPalette(const Palette16* palette) {
-      memcpy32(const_cast<uint16_t*>(this->BaseAddress()), palette, sizeof(Palette16));
+      memcpy32(const_cast<uint16_t*>(this->BaseAddress()), palette, sizeof(Palette16) / 4);
     }
   };
 
