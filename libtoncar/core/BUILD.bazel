@@ -10,7 +10,6 @@ cc_library(
     ],
     hdrs = [
         "attributes.h",
-        "charblock.h",
         "colors.h",
         "interrupt_manager.h",
         "mgba/logger.h",
@@ -21,6 +20,7 @@ cc_library(
         "screen.h",
         "sprite.h",
         "toncar.h",
+        "vram.h",
         "zone.h",
     ],
     copts = CXXOPTS,

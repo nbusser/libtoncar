@@ -1,14 +1,14 @@
 #include <asm/bios.h>
-#include <charblock.h>
+#include <libtoncar/vram.h>
 #include <palram.h>
 #include <sprite.h>
+#include <vram.h>
 
 #include <cstdint>
 #include <cstdlib>
 
 #include "example/assets/gfx/example.h"
 #include "interrupt_manager.h"
-#include "libtoncar/charblock.h"
 #include "libtoncar/colors.h"
 #include "libtoncar/palram.h"
 #include "libtoncar/registers/display.h"
@@ -49,7 +49,8 @@ int main() {
   dispcnt.Reset().SetMode(Dispcnt::Mode::DcntMode0).SetLayer<Dispcnt::Layer::DcntBg2>();
 
   Palram::Instance().SpritesPalbank().LoadPalette(sprites::example::french.GetSprite(0).Palette());
-  Charblock(0x00010000).LoadTiles(sprites::example::french.GetSprite(0));
+  Vram::Instance().SpriteCharblock(0).LoadTiles(sprites::example::french.GetSprite(0));
+  Vram::Instance().SpriteCharblock(1).LoadTiles(sprites::example::germany.GetSprite(0));
 
   while (true) {
     VBlankIntrWait();
