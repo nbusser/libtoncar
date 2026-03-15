@@ -28,6 +28,7 @@ def gfx_sprites(name, srcs, copts = [], **kwargs):
         srcs = generated_srcs,
         hdrs = generated_hdrs,
         copts = copts,
+        include_prefix = "gfx",
         deps = ["//libtoncar"],
         **kwargs
     )
