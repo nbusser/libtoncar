@@ -16,13 +16,21 @@ class Palram final {
    public:
     constexpr explicit Palbank(size_t offset) : offset_{offset} {}
 
-    void LoadPalette(const Palette16* palette) const {
-      memcpy32(reinterpret_cast<uint16_t*>(kBaseAddress + offset_), palette, sizeof(Palette16) / 4);
+    void LoadPalette(const Palette16* palette) {
+      MGBA_ASSERT(next_palette_id_ < kMaxPaletteId);
+      memcpy32(reinterpret_cast<uint16_t*>(kBaseAddress + offset_ +
+                                           (next_palette_id_ * palette->size() * sizeof(uint16_t))),
+               palette,
+               sizeof(Palette16) / 4);
+      ++next_palette_id_;
     }
 
    private:
     static constexpr uintptr_t kBaseAddress{memory::kPalram};
     size_t offset_;
+
+    static constexpr uint16_t kMaxPaletteId{16};
+    uint16_t next_palette_id_{0};
   };
 
  public:
