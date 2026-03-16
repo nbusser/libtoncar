@@ -18,7 +18,7 @@ class Zone {
  protected:
   T Get(size_t offset) const { return BaseAddress()[offset]; }
   Derived& Set(size_t offset, T val) {
-    GBA_ASSERT(offset < size);
+    MGBA_ASSERT(offset < size);
     BaseAddress()[offset] = val;
     return Self();
   }

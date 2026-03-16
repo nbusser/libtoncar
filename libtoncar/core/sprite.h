@@ -60,7 +60,7 @@ class Tag {
   }
 
   [[nodiscard]] const Sprite& GetSprite(uint8_t index) const {
-    GBA_ASSERT(index < sprites_.size());
+    MGBA_ASSERT(index < sprites_.size());
     return sprites_[index];
   }
 

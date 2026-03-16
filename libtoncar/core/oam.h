@@ -15,7 +15,7 @@ class Oam final {
    public:
     uint16_t GetY() { return GetAnd(0x00FF); }
     ObjAttr0& SetY(uint16_t new_y) {
-      GBA_ASSERT(new_y <= 0xFF);
+      MGBA_ASSERT(new_y <= 0xFF);
       return And(0xFF00).Or(new_y);
     }
 
@@ -71,14 +71,14 @@ class Oam final {
    public:
     uint16_t GetX() { return GetAnd(kXMask) >> kXShift; }
     ObjAttr1& SetX(uint16_t new_x) {
-      GBA_ASSERT(new_x <= kXMask >> kXShift);
+      MGBA_ASSERT(new_x <= kXMask >> kXShift);
       return And(static_cast<uint16_t>(~kXMask)).Or(static_cast<uint16_t>(new_x << kXShift));
     }
 
     /// Only valid if attr0{8} is set.
     uint16_t GetAffineIndex() { return GetAnd(kAidMask) >> kAidShift; }
     ObjAttr1& SetAffineIndex(uint16_t new_aid) {
-      GBA_ASSERT(new_aid <= kAidMask >> kAidShift);
+      MGBA_ASSERT(new_aid <= kAidMask >> kAidShift);
       return And(static_cast<uint16_t>(~kAidMask)).Or(static_cast<uint16_t>(new_aid << kAidShift));
     }
 
@@ -118,21 +118,21 @@ class Oam final {
    public:
     uint16_t GetTileId() { return GetAnd(kTileId) >> kTileIdShift; }
     ObjAttr2& SetTileId(uint16_t new_tile_id) {
-      GBA_ASSERT(new_tile_id <= kTileId >> kTileIdShift);
+      MGBA_ASSERT(new_tile_id <= kTileId >> kTileIdShift);
       return And(static_cast<uint16_t>(~kTileIdShift))
           .Or(static_cast<uint16_t>(new_tile_id << kTileIdShift));
     }
 
     uint16_t GetPrio() { return GetAnd(kPrioMask) >> kPrioShift; }
     ObjAttr2& SetPrio(uint16_t new_prio) {
-      GBA_ASSERT(new_prio <= kPrioMask >> kPrioShift);
+      MGBA_ASSERT(new_prio <= kPrioMask >> kPrioShift);
       return And(static_cast<uint16_t>(~kPrioShift))
           .Or(static_cast<uint16_t>(new_prio << kPrioShift));
     }
 
     uint16_t Get4bppPalbank() { return GetAnd(kPalbankMask) >> kPalbankShift; }
     ObjAttr2& Set4bppPalbank(uint16_t new_palbank) {
-      GBA_ASSERT(new_palbank <= kPalbankMask >> kPalbankShift);
+      MGBA_ASSERT(new_palbank <= kPalbankMask >> kPalbankShift);
       return And(static_cast<uint16_t>(~kPalbankShift))
           .Or(static_cast<uint16_t>(new_palbank << kPalbankShift));
     }
@@ -168,12 +168,12 @@ class Oam final {
   }
 
   ObjAttr& GetSpriteAttributes(uint8_t index) {
-    GBA_ASSERT(index <= 128);
+    MGBA_ASSERT(index <= 128);
     return *const_cast<ObjAttr*>(base_address + index);
   }
 
   Oam& SetSpriteAttributes(uint8_t index, ObjAttr attributes) {
-    GBA_ASSERT(index <= 128);
+    MGBA_ASSERT(index <= 128);
     *const_cast<ObjAttr*>(base_address + index) = attributes;
     return *this;
   }

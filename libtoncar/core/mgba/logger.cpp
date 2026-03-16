@@ -39,7 +39,7 @@ const auto kRegDebugString = reinterpret_cast<char*>(0x4FFF600);
 
 template <Logger::Level level>
 ssize_t MgbaConsoleWrite(struct _reent* /*r*/, void* /*fd*/, const char* ptr, size_t len) {
-  GBA_ASSERT(len <= kDebugStringMaxSize);
+  MGBA_ASSERT(len <= kDebugStringMaxSize);
   strncpy(kRegDebugString, ptr, len);
   MgbaDebugFlagsRegister::Instance().SetLevel(level);
   return static_cast<ssize_t>(len);
@@ -86,7 +86,7 @@ Logger::Logger()
           BuildDevoptTab<Logger::Level::Error>("mgba_stderr"),
       } {
   MgbaDebugRegister::Instance().Enable();
-  GBA_ASSERT(MgbaDebugRegister::Instance().IsEnabled());
+  MGBA_ASSERT(MgbaDebugRegister::Instance().IsEnabled());
   // TODO: check if it should be cleared on dtor
   devoptab_list[STD_OUT] = &dotab_stdout_;
   devoptab_list[STD_ERR] = &dotab_stderr_;
@@ -104,7 +104,7 @@ void Logger::Log(Level level, const char* log_string, ...) {
   va_end(args);
   MgbaDebugFlagsRegister::Instance().SetLevel(level);
 
-  GBA_ASSERT(level != Level::Fatal);
+  MGBA_ASSERT(level != Level::Fatal);
 }
 
 }  // namespace toncar::mgba

@@ -34,17 +34,17 @@ class Vram final {
   }
 
   Charblock& GetCharblock(uint8_t index) {
-    GBA_ASSERT(index <= 5);
+    MGBA_ASSERT(index <= 5);
     return charblocks_[index];
   }
 
   Charblock& BackgroundCharblock(uint8_t index) {
-    GBA_ASSERT(index <= 3);
+    MGBA_ASSERT(index <= 3);
     return charblocks_[index];
   }
 
   Charblock& SpriteCharblock(uint8_t index) {
-    GBA_ASSERT(index <= 1);
+    MGBA_ASSERT(index <= 1);
     return charblocks_[kSpriteCharblockIndex + index];
   }
 
