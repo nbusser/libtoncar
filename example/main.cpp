@@ -52,23 +52,51 @@ int main() {
   dispcnt.Reset()
       .SetMode(Dispcnt::Mode::DcntMode0)
       .SetLayer<Dispcnt::Layer::DcntBg2>()
-      .SetLayer<Dispcnt::Layer::DcntObj>();
+      .SetLayer<Dispcnt::Layer::DcntObj>()
+      .Set1dMapping();
 
   Palram::Instance().SpritesPalbank().LoadPalette(sprites::example::french.GetSprite(0).Palette());
   Vram::Instance().SpriteCharblock(0).LoadTiles(sprites::example::french.GetSprite(0));
-  Vram::Instance().SpriteCharblock(1).LoadTiles(sprites::example::germany.GetSprite(0));
+  Vram::Instance().SpriteCharblock(0).LoadTiles(sprites::example::germany.GetSprite(0));
+  Vram::Instance().SpriteCharblock(0).LoadTiles(sprites::example::smiley.GetSprite(0));
 
-  Oam::ObjAttr& attr{Oam::Instance().GetSpriteAttributes(0)};
-  attr.attr0.SetY(30)
+  Oam::ObjAttr& france_obj{Oam::Instance().RefSpriteAttributes(0)};
+  france_obj.attr0.SetY(50)
       .SetOm(Oam::ObjAttr0::OM::NormalRendering)
       .SetGm(Oam::ObjAttr0::GM::NormalRendering)
       .SetShape(Oam::ObjAttr0::Shape::Square)
       .SetColorMode4bpp();
-  attr.attr1.SetX(30).SetSize(Oam::ObjAttr1::Size::Medium);
-  attr.attr2.Set4bppPalbank(0).SetPrio(1).SetTileId(0);
-  Oam::Instance().SetSpriteAttributes(0, attr);
+  france_obj.attr1.SetX(30).SetSize(Oam::ObjAttr1::Size::Medium);
+  france_obj.attr2.Set4bppPalbank(0).SetPrio(1).SetTileId(0);
+
+  Oam::ObjAttr& germany_obj{Oam::Instance().RefSpriteAttributes(1)};
+  germany_obj.attr0.SetY(30)
+      .SetOm(Oam::ObjAttr0::OM::NormalRendering)
+      .SetGm(Oam::ObjAttr0::GM::NormalRendering)
+      .SetShape(Oam::ObjAttr0::Shape::Square)
+      .SetColorMode4bpp();
+  germany_obj.attr1.SetX(180).SetSize(Oam::ObjAttr1::Size::Medium);
+  germany_obj.attr2.Set4bppPalbank(0).SetPrio(1).SetTileId(16);
+
+  Oam::ObjAttr& smiley_obj{Oam::Instance().RefSpriteAttributes(2)};
+  smiley_obj.attr0.SetY(10)
+      .SetOm(Oam::ObjAttr0::OM::NormalRendering)
+      .SetGm(Oam::ObjAttr0::GM::NormalRendering)
+      .SetShape(Oam::ObjAttr0::Shape::Square)
+      .SetColorMode4bpp();
+  smiley_obj.attr1.SetX(150).SetSize(Oam::ObjAttr1::Size::Medium);
+  smiley_obj.attr2.Set4bppPalbank(0).SetPrio(1).SetTileId(32);
 
   while (true) {
     VBlankIntrWait();
+    if (vblank_counter % 2 == 0) {
+      france_obj.attr1.SetX(france_obj.attr1.GetX() + 1);
+    }
+    if (vblank_counter % 10 == 0) {
+      smiley_obj.attr0.SetY(smiley_obj.attr0.GetY() + 1);
+    }
+    if (vblank_counter % 20 == 0) {
+      germany_obj.attr1.ToggleVerticalFlip();
+    }
   }
 }

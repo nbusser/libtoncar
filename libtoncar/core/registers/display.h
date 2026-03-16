@@ -32,6 +32,10 @@ class Dispcnt : public Register<Dispcnt, uint16_t, 0x00> {
     DcntObj = 12   // 0x1000
   };
 
+  bool Is1dMapping() { return HasBit<6>(); }
+  Dispcnt& Set1dMapping() { return SetBit<6>(); }
+  Dispcnt& Set2dMapping() { return ClearBit<6>(); }
+
   template <Layer layer>
   Dispcnt& SetLayer() {
     return SetBit<std::to_underlying(layer)>();

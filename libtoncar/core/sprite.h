@@ -2,6 +2,7 @@
 
 #include <colors.h>
 #include <panic.h>
+#include <toncar.h>
 
 #include <array>
 #include <cstdint>
@@ -37,6 +38,10 @@ class Sprite {
   [[nodiscard]] const Palette16* Palette() const { return palette_; }
 
   [[nodiscard]] std::span<const uint8_t> Data() const { return data_; }
+
+  [[nodiscard]] constexpr uint16_t TilesCount() const {
+    return static_cast<uint16_t>(data_.size() / constants::kSpriteTileSizeBytes);
+  }
 
  private:
   /// Stored in ROM. Lifetime static.

@@ -13,7 +13,7 @@ class Oam final {
  public:
   class ObjAttr0 : public Attribute<ObjAttr0, uint16_t> {
    public:
-    uint16_t GetY() { return GetAnd(0x00FF); }
+    [[nodiscard]] uint16_t GetY() const { return GetAnd(0x00FF); }
     ObjAttr0& SetY(uint16_t new_y) {
       MGBA_ASSERT(new_y <= 0xFF);
       return And(0xFF00).Or(new_y);
@@ -25,29 +25,31 @@ class Oam final {
       Hide = 0b11,
       AffineDoubleRendering = 0b11
     };
-    OM GetOm() { return static_cast<OM>(GetAnd(kOmMask) >> kOmShift); }
+    [[nodiscard]] OM GetOm() const { return static_cast<OM>(GetAnd(kOmMask) >> kOmShift); }
     ObjAttr0& SetOm(OM om) {
       return And(static_cast<uint16_t>(~kOmMask))
           .Or(static_cast<uint16_t>(static_cast<uint16_t>(om) << kOmShift));
     }
 
     enum class GM : uint8_t { NormalRendering = 0b00, AlphaBlending = 0b01, ObjectWindow = 0b10 };
-    GM GetGm() { return static_cast<GM>(GetAnd(kGmMask) >> kGmShift); }
+    [[nodiscard]] GM GetGm() const { return static_cast<GM>(GetAnd(kGmMask) >> kGmShift); }
     ObjAttr0& SetGm(GM gm) {
       return And(static_cast<uint16_t>(~kGmMask))
           .Or(static_cast<uint16_t>(static_cast<uint16_t>(gm) << kGmShift));
     }
 
-    bool HasMosaic() { return HasBit<12>(); }
+    [[nodiscard]] bool HasMosaic() const { return HasBit<12>(); }
     ObjAttr0& SetMosaic() { return SetBit<12>(); }
     ObjAttr0& ClearMosaic() { return ClearBit<12>(); }
 
-    bool IsColorMode4bpp() { return HasBit<13>(); }
+    [[nodiscard]] bool IsColorMode4bpp() const { return HasBit<13>(); }
     ObjAttr0& SetColorMode8bpp() { return SetBit<13>(); }
     ObjAttr0& SetColorMode4bpp() { return ClearBit<13>(); }
 
     enum class Shape : uint8_t { Square = 0b00, Wide = 0b01, Tall = 0b10 };
-    Shape GetShape() { return static_cast<Shape>(GetAnd(kShapeMask) >> kShapeShift); }
+    [[nodiscard]] Shape GetShape() const {
+      return static_cast<Shape>(GetAnd(kShapeMask) >> kShapeShift);
+    }
     ObjAttr0& SetShape(Shape shape) {
       return And(static_cast<uint16_t>(~kShapeMask))
           .Or(static_cast<uint16_t>(static_cast<uint16_t>(shape) << kShapeShift));
@@ -69,28 +71,40 @@ class Oam final {
 
   class ObjAttr1 : public Attribute<ObjAttr1, uint16_t> {
    public:
-    uint16_t GetX() { return GetAnd(kXMask) >> kXShift; }
+    [[nodiscard]] uint16_t GetX() const { return GetAnd(kXMask) >> kXShift; }
     ObjAttr1& SetX(uint16_t new_x) {
       MGBA_ASSERT(new_x <= kXMask >> kXShift);
       return And(static_cast<uint16_t>(~kXMask)).Or(static_cast<uint16_t>(new_x << kXShift));
     }
 
     /// Only valid if attr0{8} is set.
-    uint16_t GetAffineIndex() { return GetAnd(kAidMask) >> kAidShift; }
+    [[nodiscard]] uint16_t GetAffineIndex() const { return GetAnd(kAidMask) >> kAidShift; }
     ObjAttr1& SetAffineIndex(uint16_t new_aid) {
       MGBA_ASSERT(new_aid <= kAidMask >> kAidShift);
       return And(static_cast<uint16_t>(~kAidMask)).Or(static_cast<uint16_t>(new_aid << kAidShift));
     }
 
     /// Only valid if attr0{8} is unset.
-    bool IsHorizontalFlip() { return HasBit<12>(); }
+    [[nodiscard]] bool IsHorizontalFlip() const { return HasBit<12>(); }
     ObjAttr1& SetHorizontalFlip() { return SetBit<12>(); }
     ObjAttr1& ClearHorizontalFlip() { return ClearBit<12>(); }
+    ObjAttr1& ToggleHorizontalFlip() {
+      if (IsHorizontalFlip()) {
+        return ClearHorizontalFlip();
+      }
+      return SetHorizontalFlip();
+    }
 
     /// Only valid if attr0{8} is unset.
-    bool IsVerticalFlip() { return HasBit<13>(); }
+    [[nodiscard]] bool IsVerticalFlip() const { return HasBit<13>(); }
     ObjAttr1& SetVerticalFlip() { return SetBit<13>(); }
     ObjAttr1& ClearVerticalFlip() { return ClearBit<13>(); }
+    ObjAttr1& ToggleVerticalFlip() {
+      if (IsVerticalFlip()) {
+        return ClearVerticalFlip();
+      }
+      return SetVerticalFlip();
+    }
 
     enum class Size : uint8_t { Tiny = 0b00, Small = 0b01, Medium = 0b10, Large = 0b11 };
     Size GetSize() { return static_cast<Size>(GetAnd(kSizeMask) >> kSizeShift); }
@@ -167,9 +181,14 @@ class Oam final {
     return oam;
   }
 
-  ObjAttr& GetSpriteAttributes(uint8_t index) {
+  ObjAttr& RefSpriteAttributes(uint8_t index) {
     MGBA_ASSERT(index <= 128);
     return *const_cast<ObjAttr*>(base_address + index);
+  }
+
+  const ObjAttr& CRefSpriteAttributes(uint8_t index) {
+    MGBA_ASSERT(index <= 128);
+    return *const_cast<const ObjAttr*>(base_address + index);
   }
 
   Oam& SetSpriteAttributes(uint8_t index, ObjAttr attributes) {
