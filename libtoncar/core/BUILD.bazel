@@ -10,6 +10,7 @@ cc_library(
     ],
     hdrs = [
         "attributes.h",
+        "background_vram.h",
         "colors.h",
         "interrupt_manager.h",
         "mgba/logger.h",
@@ -18,6 +19,7 @@ cc_library(
         "palram.h",
         "panic.h",
         "registers/attribute.h",
+        "registers/background.h",
         "registers/display.h",
         "registers/registers.h",
         "screen.h",

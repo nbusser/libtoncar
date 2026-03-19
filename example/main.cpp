@@ -13,6 +13,7 @@
 #include "libtoncar/oam.h"
 #include "libtoncar/object_vram.h"
 #include "libtoncar/palram.h"
+#include "libtoncar/registers/background.h"
 #include "libtoncar/registers/display.h"
 #include "libtoncar/screen.h"
 #include "mgba/logger.h"

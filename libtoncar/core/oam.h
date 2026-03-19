@@ -13,11 +13,11 @@ class Oam final {
  public:
   class ObjAttr0 : public Attribute<ObjAttr0, uint16_t> {
    public:
-    // Y: 0-7 bits
+    // Y: bits 0-7
     [[nodiscard]] uint16_t GetY() const { return GetSpan<8, 0>(); }
     ObjAttr0& SetY(uint16_t new_y) { return SetSpan<8, 0>(new_y); }
 
-    /// OM: 8-9 bits
+    /// OM: bits 8-9
     enum class OM : uint8_t {
       NormalRendering = 0b00,
       AffineRendering = 0b01,
@@ -27,7 +27,7 @@ class Oam final {
     [[nodiscard]] OM GetOm() const { return static_cast<OM>(GetSpan<2, 8>()); }
     ObjAttr0& SetOm(OM om) { return SetSpan<2, 8>(static_cast<uint16_t>(om)); }
 
-    /// GM: 10-11 bits
+    /// GM: bits 10-11
     enum class GM : uint8_t { NormalRendering = 0b00, AlphaBlending = 0b01, ObjectWindow = 0b10 };
     [[nodiscard]] GM GetGm() const { return static_cast<GM>(GetSpan<2, 10>()); }
     ObjAttr0& SetGm(GM gm) { return SetSpan<2, 10>(static_cast<uint16_t>(gm)); }
@@ -36,11 +36,11 @@ class Oam final {
     ObjAttr0& SetMosaic() { return SetBit<12>(); }
     ObjAttr0& ClearMosaic() { return ClearBit<12>(); }
 
-    [[nodiscard]] bool IsColorMode4bpp() const { return HasBit<13>(); }
+    [[nodiscard]] bool IsColorMode4bpp() const { return !HasBit<13>(); }
     ObjAttr0& SetColorMode8bpp() { return SetBit<13>(); }
     ObjAttr0& SetColorMode4bpp() { return ClearBit<13>(); }
 
-    /// Shape: 14-15 bits
+    /// Shape: bits 14-15
     enum class Shape : uint8_t { Square = 0b00, Wide = 0b01, Tall = 0b10 };
     [[nodiscard]] Shape GetShape() const { return static_cast<Shape>(GetSpan<2, 14>()); }
     ObjAttr0& SetShape(Shape shape) { return SetSpan<2, 14>(static_cast<uint16_t>(shape)); }
@@ -48,11 +48,11 @@ class Oam final {
 
   class ObjAttr1 : public Attribute<ObjAttr1, uint16_t> {
    public:
-    /// X: 0-8 bits.
+    /// X: bits 0-8
     [[nodiscard]] uint16_t GetX() const { return GetSpan<9, 0>(); }
     ObjAttr1& SetX(uint16_t new_x) { return SetSpan<9, 0>(new_x); }
 
-    /// AID: 9-13 bits.
+    /// AID: bits 9-13
     /// Only valid if attr0{8} is set.
     [[nodiscard]] uint16_t GetAffineIndex() const { return GetSpan<5, 9>(); }
     ObjAttr1& SetAffineIndex(uint16_t new_aid) { return SetSpan<5, 9>(new_aid); }
@@ -69,7 +69,7 @@ class Oam final {
     ObjAttr1& ClearVerticalFlip() { return ClearBit<13>(); }
     ObjAttr1& ToggleVerticalFlip() { return ToggleBit<13>(); }
 
-    /// Size: 14-15 bits
+    /// Size: bits 14-15
     enum class Size : uint8_t { Tiny = 0b00, Small = 0b01, Medium = 0b10, Large = 0b11 };
     Size GetSize() { return static_cast<Size>(GetSpan<2, 14>()); }
     ObjAttr1& SetSize(Size size) { return SetSpan<2, 14>(static_cast<uint16_t>(size)); }

@@ -68,12 +68,12 @@ class Attribute {
   }
 
   template <uint8_t n_bits, uint8_t bit_position, uint16_t max_value = (1 << n_bits) - 1>
-  [[nodiscard]] Derived& SetSpan(T val) {
+  Derived& SetSpan(T val) {
     static_assert(n_bits <= sizeof(T) * 8);
     static_assert(bit_position <= (sizeof(T) * 8) - n_bits);
     MGBA_ASSERT(val <= max_value);
     constexpr T kMask{((1 << n_bits) - 1) << bit_position};
-    return And(~kMask).Or((val << bit_position) & kMask);
+    return And(~kMask).Or(val << bit_position);
   }
 
  private:

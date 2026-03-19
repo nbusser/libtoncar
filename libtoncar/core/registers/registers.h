@@ -77,7 +77,7 @@ class RegisterBase {
   friend class TransactionRegister<Derived, T, offset_from_io>;
 
  public:
-  static Derived& Instance() {
+  [[nodiscard]] static Derived& Instance() {
     static Derived instance{};
     return instance;
   }
@@ -128,11 +128,11 @@ class RegisterBase {
   }
 
   template <uint8_t n_bits, uint8_t bit_position>
-  [[nodiscard]] Derived& SetSpan(T val) const {
+  Derived& SetSpan(T val) const {
     static_assert(n_bits <= sizeof(T) * 8);
     static_assert(bit_position <= (sizeof(T) * 8) - n_bits);
     constexpr T kMask{((1 << n_bits) - 1) << bit_position};
-    return static_cast<Derived&>(*this).And(~kMask).Or((val << bit_position) & kMask);
+    return static_cast<Derived&>(*this).And(~kMask).Or(val << bit_position);
   }
 
  private:
