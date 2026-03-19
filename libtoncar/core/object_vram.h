@@ -12,7 +12,7 @@
 
 namespace toncar {
 
-class Vram final {
+class ObjectVram final {
  private:
   class Charblock final {
    public:
@@ -38,8 +38,8 @@ class Vram final {
   };
 
  public:
-  static Vram& Instance() {
-    static Vram vram{};
+  static ObjectVram& Instance() {
+    static ObjectVram vram{};
     return vram;
   }
 
@@ -59,7 +59,7 @@ class Vram final {
   }
 
  private:
-  Vram() = default;
+  ObjectVram() = default;
 
   std::array<Charblock, 6> charblocks_{Charblock{0x000000},
                                        Charblock{0x004000},

@@ -1,10 +1,8 @@
 #include <asm/bios.h>
-#include <libtoncar/vram.h>
 #include <oam.h>
 #include <palram.h>
 #include <registers/display.h>
 #include <sprite.h>
-#include <vram.h>
 
 #include <cstdint>
 #include <cstdlib>
@@ -13,6 +11,7 @@
 #include "interrupt_manager.h"
 #include "libtoncar/colors.h"
 #include "libtoncar/oam.h"
+#include "libtoncar/object_vram.h"
 #include "libtoncar/palram.h"
 #include "libtoncar/registers/display.h"
 #include "libtoncar/screen.h"
@@ -56,9 +55,9 @@ int main() {
       .Set1dMapping();
 
   Palram::Instance().SpritesPalbank().LoadPalette(sprites::example::french.GetSprite(0).Palette());
-  Vram::Instance().SpriteCharblock(0).LoadTiles(sprites::example::french.GetSprite(0));
-  Vram::Instance().SpriteCharblock(0).LoadTiles(sprites::example::germany.GetSprite(0));
-  Vram::Instance().SpriteCharblock(0).LoadTiles(sprites::example::smiley.GetSprite(0));
+  ObjectVram::Instance().SpriteCharblock(0).LoadTiles(sprites::example::french.GetSprite(0));
+  ObjectVram::Instance().SpriteCharblock(0).LoadTiles(sprites::example::germany.GetSprite(0));
+  ObjectVram::Instance().SpriteCharblock(0).LoadTiles(sprites::example::smiley.GetSprite(0));
 
   Oam::ObjAttr& france_obj{Oam::Instance().RefSpriteAttributes(0)};
   france_obj.attr0.SetY(50)
