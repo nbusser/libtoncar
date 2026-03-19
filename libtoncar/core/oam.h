@@ -13,30 +13,24 @@ class Oam final {
  public:
   class ObjAttr0 : public Attribute<ObjAttr0, uint16_t> {
    public:
-    [[nodiscard]] uint16_t GetY() const { return GetAnd(0x00FF); }
-    ObjAttr0& SetY(uint16_t new_y) {
-      MGBA_ASSERT(new_y <= 0xFF);
-      return And(0xFF00).Or(new_y);
-    }
+    // Y: 0-7 bits
+    [[nodiscard]] uint16_t GetY() const { return GetSpan<8, 0>(); }
+    ObjAttr0& SetY(uint16_t new_y) { return SetSpan<8, 0>(new_y); }
 
+    /// OM: 8-9 bits
     enum class OM : uint8_t {
       NormalRendering = 0b00,
       AffineRendering = 0b01,
       Hide = 0b11,
       AffineDoubleRendering = 0b11
     };
-    [[nodiscard]] OM GetOm() const { return static_cast<OM>(GetAnd(kOmMask) >> kOmShift); }
-    ObjAttr0& SetOm(OM om) {
-      return And(static_cast<uint16_t>(~kOmMask))
-          .Or(static_cast<uint16_t>(static_cast<uint16_t>(om) << kOmShift));
-    }
+    [[nodiscard]] OM GetOm() const { return static_cast<OM>(GetSpan<2, 8>()); }
+    ObjAttr0& SetOm(OM om) { return SetSpan<2, 8>(static_cast<uint16_t>(om)); }
 
+    /// GM: 10-11 bits
     enum class GM : uint8_t { NormalRendering = 0b00, AlphaBlending = 0b01, ObjectWindow = 0b10 };
-    [[nodiscard]] GM GetGm() const { return static_cast<GM>(GetAnd(kGmMask) >> kGmShift); }
-    ObjAttr0& SetGm(GM gm) {
-      return And(static_cast<uint16_t>(~kGmMask))
-          .Or(static_cast<uint16_t>(static_cast<uint16_t>(gm) << kGmShift));
-    }
+    [[nodiscard]] GM GetGm() const { return static_cast<GM>(GetSpan<2, 10>()); }
+    ObjAttr0& SetGm(GM gm) { return SetSpan<2, 10>(static_cast<uint16_t>(gm)); }
 
     [[nodiscard]] bool HasMosaic() const { return HasBit<12>(); }
     ObjAttr0& SetMosaic() { return SetBit<12>(); }
@@ -46,123 +40,51 @@ class Oam final {
     ObjAttr0& SetColorMode8bpp() { return SetBit<13>(); }
     ObjAttr0& SetColorMode4bpp() { return ClearBit<13>(); }
 
-    enum class Shape : uint8_t { Square = 0b00, Wide = 0b01, Tall = 0b10 };
-    [[nodiscard]] Shape GetShape() const {
-      return static_cast<Shape>(GetAnd(kShapeMask) >> kShapeShift);
-    }
-    ObjAttr0& SetShape(Shape shape) {
-      return And(static_cast<uint16_t>(~kShapeMask))
-          .Or(static_cast<uint16_t>(static_cast<uint16_t>(shape) << kShapeShift));
-    }
-
-   private:
-    /// OM: 8-9 bits
-    static constexpr uint16_t kOmMask{0b0000001100000000};
-    static constexpr uint8_t kOmShift{8};
-
-    /// GM: 10-11 bits
-    static constexpr uint16_t kGmMask{0b0000110000000000};
-    static constexpr uint8_t kGmShift{10};
-
     /// Shape: 14-15 bits
-    static constexpr uint16_t kShapeMask{0b1100000000000000};
-    static constexpr uint8_t kShapeShift{14};
+    enum class Shape : uint8_t { Square = 0b00, Wide = 0b01, Tall = 0b10 };
+    [[nodiscard]] Shape GetShape() const { return static_cast<Shape>(GetSpan<2, 14>()); }
+    ObjAttr0& SetShape(Shape shape) { return SetSpan<2, 14>(static_cast<uint16_t>(shape)); }
   };
 
   class ObjAttr1 : public Attribute<ObjAttr1, uint16_t> {
    public:
-    [[nodiscard]] uint16_t GetX() const { return GetAnd(kXMask) >> kXShift; }
-    ObjAttr1& SetX(uint16_t new_x) {
-      MGBA_ASSERT(new_x <= kXMask >> kXShift);
-      return And(static_cast<uint16_t>(~kXMask)).Or(static_cast<uint16_t>(new_x << kXShift));
-    }
+    /// X: 0-8 bits.
+    [[nodiscard]] uint16_t GetX() const { return GetSpan<9, 0>(); }
+    ObjAttr1& SetX(uint16_t new_x) { return SetSpan<9, 0>(new_x); }
 
+    /// AID: 9-13 bits.
     /// Only valid if attr0{8} is set.
-    [[nodiscard]] uint16_t GetAffineIndex() const { return GetAnd(kAidMask) >> kAidShift; }
-    ObjAttr1& SetAffineIndex(uint16_t new_aid) {
-      MGBA_ASSERT(new_aid <= kAidMask >> kAidShift);
-      return And(static_cast<uint16_t>(~kAidMask)).Or(static_cast<uint16_t>(new_aid << kAidShift));
-    }
+    [[nodiscard]] uint16_t GetAffineIndex() const { return GetSpan<5, 9>(); }
+    ObjAttr1& SetAffineIndex(uint16_t new_aid) { return SetSpan<5, 9>(new_aid); }
 
     /// Only valid if attr0{8} is unset.
     [[nodiscard]] bool IsHorizontalFlip() const { return HasBit<12>(); }
     ObjAttr1& SetHorizontalFlip() { return SetBit<12>(); }
     ObjAttr1& ClearHorizontalFlip() { return ClearBit<12>(); }
-    ObjAttr1& ToggleHorizontalFlip() {
-      if (IsHorizontalFlip()) {
-        return ClearHorizontalFlip();
-      }
-      return SetHorizontalFlip();
-    }
+    ObjAttr1& ToggleHorizontalFlip() { return ToggleBit<12>(); }
 
     /// Only valid if attr0{8} is unset.
     [[nodiscard]] bool IsVerticalFlip() const { return HasBit<13>(); }
     ObjAttr1& SetVerticalFlip() { return SetBit<13>(); }
     ObjAttr1& ClearVerticalFlip() { return ClearBit<13>(); }
-    ObjAttr1& ToggleVerticalFlip() {
-      if (IsVerticalFlip()) {
-        return ClearVerticalFlip();
-      }
-      return SetVerticalFlip();
-    }
-
-    enum class Size : uint8_t { Tiny = 0b00, Small = 0b01, Medium = 0b10, Large = 0b11 };
-    Size GetSize() { return static_cast<Size>(GetAnd(kSizeMask) >> kSizeShift); }
-    ObjAttr1& SetSize(Size size) {
-      return And(static_cast<uint16_t>(~kSizeMask))
-          .Or(static_cast<uint16_t>(static_cast<uint16_t>(size) << kSizeShift));
-    }
-
-   private:
-    /// X: 0-8 bits.
-    static constexpr uint16_t kXMask{0b0000000111111111};
-    static constexpr uint8_t kXShift{0};
-
-    /// AID: 9-13 bits.
-    /// Only valid if attr0{8} is set.
-    static constexpr uint16_t kAidMask{0b0011111000000000};
-    static constexpr uint8_t kAidShift{9};
+    ObjAttr1& ToggleVerticalFlip() { return ToggleBit<13>(); }
 
     /// Size: 14-15 bits
-    static constexpr uint16_t kSizeMask{0b1100000000000000};
-    static constexpr uint8_t kSizeShift{14};
+    enum class Size : uint8_t { Tiny = 0b00, Small = 0b01, Medium = 0b10, Large = 0b11 };
+    Size GetSize() { return static_cast<Size>(GetSpan<2, 14>()); }
+    ObjAttr1& SetSize(Size size) { return SetSpan<2, 14>(static_cast<uint16_t>(size)); }
   };
 
   class ObjAttr2 : public Attribute<ObjAttr2, uint16_t> {
    public:
-    uint16_t GetTileId() { return GetAnd(kTileId) >> kTileIdShift; }
-    ObjAttr2& SetTileId(uint16_t new_tile_id) {
-      MGBA_ASSERT(new_tile_id <= kTileId >> kTileIdShift);
-      return And(static_cast<uint16_t>(~kTileIdShift))
-          .Or(static_cast<uint16_t>(new_tile_id << kTileIdShift));
-    }
+    uint16_t GetTileId() { return GetSpan<10, 0>(); }
+    ObjAttr2& SetTileId(uint16_t new_tile_id) { return SetSpan<10, 0>(new_tile_id); }
 
-    uint16_t GetPrio() { return GetAnd(kPrioMask) >> kPrioShift; }
-    ObjAttr2& SetPrio(uint16_t new_prio) {
-      MGBA_ASSERT(new_prio <= kPrioMask >> kPrioShift);
-      return And(static_cast<uint16_t>(~kPrioShift))
-          .Or(static_cast<uint16_t>(new_prio << kPrioShift));
-    }
+    uint16_t GetPrio() { return GetSpan<2, 10>(); }
+    ObjAttr2& SetPrio(uint16_t new_prio) { return SetSpan<2, 10>(new_prio); }
 
-    uint16_t Get4bppPalbank() { return GetAnd(kPalbankMask) >> kPalbankShift; }
-    ObjAttr2& Set4bppPalbank(uint16_t new_palbank) {
-      MGBA_ASSERT(new_palbank <= kPalbankMask >> kPalbankShift);
-      return And(static_cast<uint16_t>(~kPalbankShift))
-          .Or(static_cast<uint16_t>(new_palbank << kPalbankShift));
-    }
-
-   private:
-    /// TID: 0-9 bits.
-    static constexpr uint16_t kTileId{0b0000001111111111};
-    static constexpr uint8_t kTileIdShift{0};
-
-    /// Prio: 10-11 bits.
-    static constexpr uint16_t kPrioMask{0b0000110000000000};
-    static constexpr uint8_t kPrioShift{10};
-
-    /// Palbank: 12-15 bits.
-    static constexpr uint16_t kPalbankMask{0b1111000000000000};
-    static constexpr uint8_t kPalbankShift{12};
+    uint16_t Get4bppPalbank() { return GetSpan<4, 12>(); }
+    ObjAttr2& Set4bppPalbank(uint16_t new_palbank) { return SetSpan<4, 12>(new_palbank); }
   };
 
   static_assert(sizeof(ObjAttr0) == sizeof(uint16_t));

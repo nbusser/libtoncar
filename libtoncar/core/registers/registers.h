@@ -22,6 +22,7 @@ class Register : public RegisterBase<Derived, T, offset_from_io> {
 
   Derived& Or(T val) { return Set(Base::GetOr(val)); }
   Derived& And(T val) { return Set(Base::GetAnd(val)); }
+  Derived& Xor(T val) { return Set(Base::GetXor(val)); }
 
  private:
   using Base = RegisterBase<Derived, T, offset_from_io>;
@@ -52,6 +53,7 @@ class TransactionRegister : public RegisterBase<Derived, T, offset_from_io> {
 
   Derived& Or(T val) { return Set(staged_value_ | val); }
   Derived& And(T val) { return Set(staged_value_ & val); }
+  Derived& Xor(T val) { return Set(staged_value_ ^ val); }
 
  public:
   TransactionRegister() : staged_value_{default_value}, last_commit_value_{default_value} {}
@@ -68,6 +70,7 @@ class TransactionRegister : public RegisterBase<Derived, T, offset_from_io> {
 // Derived& Set(T /*val*/);
 // Derived& Or(T /*val*/);
 // Derived& And(T /*val*/);
+// Derived& Xor(T /*val*/);
 template <typename Derived, std::unsigned_integral T, uint32_t offset_from_io>
 class RegisterBase {
   friend class Register<Derived, T, offset_from_io>;
@@ -84,7 +87,9 @@ class RegisterBase {
 
   [[nodiscard]] T GetOr(T val) const { return CRef() | val; }
   [[nodiscard]] T GetAnd(T val) const { return CRef() & val; }
+  [[nodiscard]] T GetXor(T val) const { return CRef() ^ val; }
 
+  // Single bit accessors
   template <uint8_t position>
   [[nodiscard]] bool HasBit() const {
     static_assert(position < sizeof(T) * 8);
@@ -104,6 +109,30 @@ class RegisterBase {
     static_assert(position < sizeof(T) * 8);
     constexpr T kMask{static_cast<T>(~(T{1} << position))};
     return static_cast<Derived&>(*this).And(kMask);
+  }
+
+  template <uint8_t position>
+  Derived& ToggleBit() {
+    static_assert(position < sizeof(T) * 8);
+    constexpr T kMask{T{1} << position};
+    return static_cast<Derived&>(*this).Xor(kMask);
+  }
+
+  // Span accessor
+  template <uint8_t n_bits, uint8_t bit_position>
+  [[nodiscard]] T GetSpan() const {
+    static_assert(n_bits <= sizeof(T) * 8);
+    static_assert(bit_position <= (sizeof(T) * 8) - n_bits);
+    constexpr T kMask{((1 << n_bits) - 1) << bit_position};
+    return GetAnd(kMask) >> bit_position;
+  }
+
+  template <uint8_t n_bits, uint8_t bit_position>
+  [[nodiscard]] Derived& SetSpan(T val) const {
+    static_assert(n_bits <= sizeof(T) * 8);
+    static_assert(bit_position <= (sizeof(T) * 8) - n_bits);
+    constexpr T kMask{((1 << n_bits) - 1) << bit_position};
+    return static_cast<Derived&>(*this).And(~kMask).Or((val << bit_position) & kMask);
   }
 
  private:
