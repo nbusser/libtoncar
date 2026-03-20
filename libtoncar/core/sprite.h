@@ -1,12 +1,13 @@
 #pragma once
 
 #include <colors.h>
-#include <panic.h>
 #include <toncar.h>
 
 #include <array>
 #include <cstdint>
 #include <span>
+
+#include "gba-assert.h"
 
 namespace toncar {
 

@@ -3,12 +3,13 @@
 #include <asm/memcpy.h>
 #include <libtoncar/toncar.h>
 #include <mgba/logger.h>
-#include <panic.h>
 #include <sprite.h>
 #include <toncar.h>
 
 #include <array>
 #include <cstdint>
+
+#include "gba-assert.h"
 
 namespace toncar {
 

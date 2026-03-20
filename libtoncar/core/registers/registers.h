@@ -1,11 +1,12 @@
 #pragma once
 
 #include <mgba/logger.h>
-#include <panic.h>
 #include <toncar.h>
 
 #include <concepts>
 #include <cstdint>
+
+#include "gba-assert.h"
 
 namespace toncar {
 
@@ -127,10 +128,11 @@ class RegisterBase {
     return GetAnd(kMask) >> bit_position;
   }
 
-  template <uint8_t n_bits, uint8_t bit_position>
-  Derived& SetSpan(T val) const {
+  template <uint8_t n_bits, uint8_t bit_position, uint16_t max_value = (1 << n_bits) - 1>
+  Derived& SetSpan(T val) {
     static_assert(n_bits <= sizeof(T) * 8);
     static_assert(bit_position <= (sizeof(T) * 8) - n_bits);
+    MGBA_ASSERT(val <= max_value);
     constexpr T kMask{((1 << n_bits) - 1) << bit_position};
     return static_cast<Derived&>(*this).And(~kMask).Or(val << bit_position);
   }

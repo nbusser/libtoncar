@@ -4,20 +4,20 @@ load("//bazel:copts.bzl", "CXXOPTS")
 cc_library(
     name = "core",
     srcs = [
+        "gba-assert.cpp",
         "interrupt_manager.cpp",
         "mgba/logger.cpp",
-        "panic.cpp",
     ],
     hdrs = [
         "attributes.h",
         "background_vram.h",
         "colors.h",
+        "gba-assert.h",
         "interrupt_manager.h",
         "mgba/logger.h",
         "oam.h",
         "object_vram.h",
         "palram.h",
-        "panic.h",
         "registers/attribute.h",
         "registers/background.h",
         "registers/display.h",

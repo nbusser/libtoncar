@@ -1,6 +1,5 @@
 #include "mgba/logger.h"
 
-#include <panic.h>
 #include <registers/registers.h>
 #include <sys/iosupport.h>
 #include <sys/reent.h>
@@ -11,6 +10,8 @@
 #include <cstdio>
 #include <cstring>
 #include <string_view>
+
+#include "gba-assert.h"
 
 namespace toncar::mgba {
 

@@ -1,10 +1,9 @@
 #pragma once
 
-#include <panic.h>
-
 #include <cstdint>
 #include <utility>
 
+#include "gba-assert.h"
 #include "registers/registers.h"
 
 namespace toncar {

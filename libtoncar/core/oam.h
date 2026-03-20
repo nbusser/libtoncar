@@ -1,11 +1,10 @@
 #pragma once
 
-#include <registers/attribute.h>
-
 #include <cstdint>
 
-#include "libtoncar/core/panic.h"
-#include "libtoncar/core/toncar.h"
+#include "gba-assert.h"
+#include "registers/attribute.h"
+#include "toncar.h"
 
 namespace toncar {
 

@@ -1,4 +1,4 @@
-#include "panic.h"
+#include "gba-assert.h"
 
 #include <cstdint>
 #include <string_view>

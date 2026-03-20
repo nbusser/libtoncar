@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "panic.h"
+#include "gba-assert.h"
 
 namespace toncar {
 
