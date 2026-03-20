@@ -1,12 +1,10 @@
 #pragma once
 
-#include <mgba/logger.h>
-#include <toncar.h>
-
 #include <concepts>
 #include <cstdint>
 
 #include "gba-assert.h"
+#include "toncar.h"
 
 namespace toncar {
 

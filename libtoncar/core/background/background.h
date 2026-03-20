@@ -1,10 +1,8 @@
 #pragma once
 
-#include <registers/registers.h>
-
 #include <cstdint>
 
-#include "libtoncar/registers/registers.h"
+#include "registers/registers.h"
 
 namespace toncar {
 

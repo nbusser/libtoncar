@@ -1,21 +1,17 @@
-#include <asm/bios.h>
-#include <oam.h>
-#include <palram.h>
-#include <registers/display.h>
-#include <sprite.h>
-
 #include <cstdint>
 #include <cstdlib>
 
 #include "example/assets/gfx/example.h"
 #include "interrupt_manager.h"
+#include "libtoncar/asm/bios.h"
+#include "libtoncar/background/background.h"
 #include "libtoncar/colors.h"
-#include "libtoncar/oam.h"
-#include "libtoncar/object_vram.h"
+#include "libtoncar/oam/oam.h"
+#include "libtoncar/oam/object_vram.h"
 #include "libtoncar/palram.h"
-#include "libtoncar/registers/background.h"
 #include "libtoncar/registers/display.h"
 #include "libtoncar/screen.h"
+#include "libtoncar/sprite.h"
 #include "mgba/logger.h"
 
 // NOLINTNEXTLINE(google-build-using-namespace)

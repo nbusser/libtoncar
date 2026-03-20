@@ -1,11 +1,10 @@
 #include "interrupt_manager.h"
 
-#include <asm/interrupt.h>
-#include <asm/memset.h>
-
 #include <cstdint>
 #include <utility>
 
+#include "asm/interrupt.h"
+#include "asm/memset.h"
 #include "attributes.h"
 #include "mgba/logger.h"
 #include "registers/display.h"

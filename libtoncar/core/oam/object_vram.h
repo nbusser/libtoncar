@@ -1,15 +1,12 @@
 #pragma once
 
-#include <asm/memcpy.h>
-#include <libtoncar/toncar.h>
-#include <mgba/logger.h>
-#include <sprite.h>
-#include <toncar.h>
-
 #include <array>
 #include <cstdint>
 
+#include "asm/memcpy.h"
 #include "gba-assert.h"
+#include "sprite.h"
+#include "toncar.h"
 
 namespace toncar {
 

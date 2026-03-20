@@ -1,11 +1,9 @@
 #pragma once
 
-#include <asm/memcpy.h>
-#include <sprite.h>
-#include <zone.h>
-
 #include <cstdint>
 
+#include "asm/memcpy.h"
+#include "sprite.h"
 #include "toncar.h"
 
 namespace toncar {
