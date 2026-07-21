@@ -23,7 +23,7 @@ uint32_t vblank_counter{0};
 
 void VBlankCounter() {
   ++vblank_counter;
-  MGBA_LOG_DEBUG("VBlank counter: %lu", static_cast<unsigned long>(vblank_counter));
+  MGBA_LOG_DEBUG("VBlank counter: %lu", vblank_counter);
 }
 }  // namespace
 
