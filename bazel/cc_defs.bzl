@@ -1,17 +1,8 @@
-# Bazel + GCC,
-#   Default:
-#     -U_FORTIFY_SOURCE
-#     -Wall
-#     -Wunused-but-set-parameter
-#     -Wno-free-nonheap-object
-#     -fno-omit-frame-pointer
-#   With -c dbg, adds:
-#     -g
-#   With -c opt, adds:
-#     -g0 -O2
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//bazel/gba_platform:transition.bzl", "gba_wrap")
 
 # Base C options
-COPTS_BASE = [
+_COPTS_BASE = [
     "-std=gnu11",
 ]
 
@@ -29,15 +20,15 @@ _COPTS_WARNING = [
 ]
 
 # Internal C compilation options. Use this by default for all C targets in the repo.
-COPTS = (
-    COPTS_BASE +
+DEFAULT_COPTS = (
+    _COPTS_BASE +
     select({
         "//bazel:strict_false": _COPTS_WARNING,
         "//bazel:strict_true": _COPTS_WARNING + ["-Werror"],
     })
 )
 
-CXXOPTS_BASE = [
+_CXXOPTS_BASE = [
     "-std=gnu++23",
 ]
 
@@ -71,10 +62,30 @@ _CXXOPTS_WARNING = [
 ]
 
 # Internal C++ compilation options. Use this by default for all C++ targets in the repo.
-CXXOPTS = (
-    CXXOPTS_BASE +
+DEFAULT_CXXOPTS = (
+    _CXXOPTS_BASE +
     select({
         "//bazel:strict_false": _CXXOPTS_WARNING,
         "//bazel:strict_true": _CXXOPTS_WARNING + ["-Werror"],
     })
 )
+
+def gba_binary(name, copts = [], **kwargs):
+    """Like `cc_binary`, but always builds for the GBA platform."""
+
+    gba_wrap(
+        cc_binary,
+        name,
+        copts = DEFAULT_CXXOPTS + copts,
+        **kwargs
+    )
+
+def gba_library(name, copts = [], **kwargs):
+    """Like `cc_library`, but always builds for the GBA platform."""
+
+    gba_wrap(
+        cc_library,
+        name,
+        copts = DEFAULT_CXXOPTS + copts,
+        **kwargs
+    )

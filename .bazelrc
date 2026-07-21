@@ -1,6 +1,6 @@
 build --compilation_mode=dbg
 
-build:gba --platforms=//platform:gba
+build:gba --platforms=//bazel/gba_platform:gba
 build:gba --copt=-fdiagnostics-color
 build:gba --host_copt=-fdiagnostics-color
 build:gba --incompatible_enable_cc_toolchain_resolution

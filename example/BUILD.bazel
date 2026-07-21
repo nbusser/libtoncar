@@ -1,13 +1,11 @@
-load("//bazel:copts.bzl", "CXXOPTS")
-load("//platform:defs.bzl", "gba_rom")
-load("//platform:transition.bzl", "gba_binary")
+load("//bazel:cc_defs.bzl", "gba_binary")
+load("//bazel/gba_platform:defs.bzl", "gba_rom")
 
 gba_binary(
     name = "game.elf",
     srcs = ["main.cpp"],
-    additional_linker_inputs = ["@//platform:gba_specs"],
-    copts = CXXOPTS,
-    linkopts = ["-specs=$(location @//platform:gba_specs)"],
+    additional_linker_inputs = ["@//bazel/gba_platform:gba_specs"],
+    linkopts = ["-specs=$(location @//bazel/gba_platform:gba_specs)"],
     visibility = ["//examples:__pkg__"],
     deps = [
         "//example/assets/gfx:example_sprites",

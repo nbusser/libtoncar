@@ -65,6 +65,7 @@
     "isystem",
     "IWRAM",
     "IWYU",
+    "kwargs",
     "lgcc",
     "libc",
     "libexec",

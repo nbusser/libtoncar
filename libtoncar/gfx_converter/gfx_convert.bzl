@@ -1,4 +1,4 @@
-load("//platform:transition.bzl", "gba_library")
+load("//bazel:cc_defs.bzl", "gba_library")
 
 def gfx_sprites(name, srcs, copts = [], **kwargs):
     generated_srcs = []

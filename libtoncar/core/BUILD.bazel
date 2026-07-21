@@ -1,5 +1,4 @@
-load("//bazel:copts.bzl", "CXXOPTS")
-load("//platform:transition.bzl", "gba_library")
+load("//bazel:cc_defs.bzl", "gba_library")
 
 gba_library(
     name = "core",
@@ -27,7 +26,6 @@ gba_library(
         "toncar.h",
         "zone.h",
     ],
-    copts = CXXOPTS,
     include_prefix = "libtoncar",
     includes = ["."],
     strip_include_prefix = "",

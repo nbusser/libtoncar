@@ -1,4 +1,4 @@
-load("//platform:transition.bzl", "gba_library")
+load("//bazel:cc_defs.bzl", "gba_library")
 
 # Contains the proper .s definitions of functions exposed in `asm`.
 gba_library(

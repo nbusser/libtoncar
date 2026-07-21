@@ -26,8 +26,8 @@ cc_library(
     hdrs = glob(["include/*.h"]),
     includes = ["include"],
     target_compatible_with = [
-        "@//platform:os",
-        "@//platform:arm7tdmi",
+        "@//bazel/gba_platform:os",
+        "@//bazel/gba_platform:arm7tdmi",
     ],
     visibility = ["//src:__subpackages__"],
     deps = [":libtonc_asm"],

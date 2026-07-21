@@ -40,7 +40,7 @@ use_repo(crate, "crates")
 # MARK: Toolchains
 
 register_toolchains(
-    "//platform:toolchain",
+    "//bazel/gba_platform:toolchain",
     "@rust_toolchains//:all",
 )
 
@@ -56,7 +56,7 @@ register_toolchains(
 
 new_tarball_dependency = use_repo_rule("//deps/tarballs:new_tarball_dependency.bzl", "new_tarball_dependency")
 
-# Initially fetched by //platform:repo.bzl.
+# Initially fetched by //bazel/gba_platform:repo.bzl.
 # TODO: handle other OS/arch. I only support darwin package at the moment to avoid inflating the git, devkitARM being large (~50MiB).
 new_tarball_dependency(
     name = "devkitarm",
