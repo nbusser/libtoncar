@@ -1,6 +1,7 @@
 """Forces GBA C++ targets to always build for the GBA platform.
 
-Declares `gba_wrap`, which wraps another rule and forces it to build for the GBA platform.
+Declares `gba_transition_wrapper`, a macro that wraps another rule and forces it to build for
+the GBA platform.
 """
 
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
@@ -14,7 +15,7 @@ _gba_platform_transition = transition(
     outputs = ["//command_line_option:platforms"],
 )
 
-def _gba_transition_wrapper_impl(ctx):
+def _gba_wrapper_impl(ctx):
     target = ctx.attr.target[0]
     default_info = target[DefaultInfo]
     providers = [
@@ -29,8 +30,8 @@ def _gba_transition_wrapper_impl(ctx):
         providers.append(target[OutputGroupInfo])
     return providers
 
-_gba_transition_wrapper = rule(
-    implementation = _gba_transition_wrapper_impl,
+gba_wrapper = rule(
+    implementation = _gba_wrapper_impl,
     attrs = {
         "target": attr.label(
             cfg = _gba_platform_transition,
@@ -43,7 +44,7 @@ _gba_transition_wrapper = rule(
     },
 )
 
-def gba_wrap(rule_fn, name, **kwargs):
+def gba_transition_wrapper(rule_fn, name, **kwargs):
     visibility = kwargs.pop("visibility", None)
     internal_name = name + "_gba_internal"
     rule_fn(
@@ -54,7 +55,7 @@ def gba_wrap(rule_fn, name, **kwargs):
         ],
         **kwargs
     )
-    _gba_transition_wrapper(
+    gba_wrapper(
         name = name,
         target = ":" + internal_name,
         visibility = visibility,

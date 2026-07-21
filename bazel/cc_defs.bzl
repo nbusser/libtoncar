@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//bazel/gba_platform:transition.bzl", "gba_wrap")
+load("//bazel/gba_platform:transition.bzl", "gba_transition_wrapper")
 
 # Base C options
 _COPTS_BASE = [
@@ -86,7 +86,7 @@ DEFAULT_CXXOPTS = (
 def gba_binary(name, copts = [], **kwargs):
     """Like `cc_binary`, but always builds for the GBA platform."""
 
-    gba_wrap(
+    gba_transition_wrapper(
         cc_binary,
         name,
         copts = DEFAULT_CXXOPTS + copts,
@@ -96,7 +96,7 @@ def gba_binary(name, copts = [], **kwargs):
 def gba_library(name, copts = [], **kwargs):
     """Like `cc_library`, but always builds for the GBA platform."""
 
-    gba_wrap(
+    gba_transition_wrapper(
         cc_library,
         name,
         copts = DEFAULT_CXXOPTS + copts,

@@ -18,7 +18,7 @@ build:
 
 compile_commands.json:
 	$(BAZEL) run --config=host //tools/generate_compile_commands -- \
-		"$(QUERY)" --extra_aquery_arg=--config=gba
+		'kind(gba_wrapper, //...)'
 
 build-dev: build compile_commands.json
 
