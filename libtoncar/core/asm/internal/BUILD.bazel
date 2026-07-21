@@ -1,7 +1,7 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//platform:transition.bzl", "gba_library")
 
 # Contains the proper .s definitions of functions exposed in `asm`.
-cc_library(
+gba_library(
     name = "internal",
     srcs = [
         "asm.h",  # Put in srcs to hide it to includers.

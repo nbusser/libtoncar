@@ -1,7 +1,7 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//platform:transition.bzl", "gba_library")
 
 # Exposes the ASM implemented functions.
-cc_library(
+gba_library(
     name = "asm",
     srcs = ["interrupt.cpp"],
     hdrs = [

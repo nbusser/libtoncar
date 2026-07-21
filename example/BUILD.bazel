@@ -1,8 +1,8 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//bazel:copts.bzl", "CXXOPTS")
 load("//platform:defs.bzl", "gba_rom")
+load("//platform:transition.bzl", "gba_binary")
 
-cc_binary(
+gba_binary(
     name = "game.elf",
     srcs = ["main.cpp"],
     additional_linker_inputs = ["@//platform:gba_specs"],

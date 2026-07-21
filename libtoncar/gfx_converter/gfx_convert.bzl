@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//platform:transition.bzl", "gba_library")
 
 def gfx_sprites(name, srcs, copts = [], **kwargs):
     generated_srcs = []
@@ -23,7 +23,7 @@ def gfx_sprites(name, srcs, copts = [], **kwargs):
         generated_srcs.append(cpp_out)
         generated_hdrs.append(h_out)
 
-    cc_library(
+    gba_library(
         name = name,
         srcs = generated_srcs,
         hdrs = generated_hdrs,
