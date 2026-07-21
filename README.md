@@ -6,10 +6,10 @@ This repo hosts the modest libtoncar, a C++ lib inspired by libtonc, and built v
 
 ## Building
 
-Requires Bazel 8.3.1. You do not have to install devKitARM, Bazel will download it automatically.
+Requires Bazel 8.3.1 and [just](https://github.com/casey/just). You do not have to install devKitARM, Bazel will download it automatically.
 
 ```shell
-make build
+just build
 ```
 
 ## Running
@@ -17,7 +17,7 @@ make build
 Requires mgba. I wish in the future to build mgba from the repo directly.
 
 ```shell
-make run
+just run
 ```
 
 ## Clangd
@@ -27,12 +27,12 @@ The repo is configured to use `clangd`.
 To generate the compile commands file, you can run:
 
 ```shell
-make compile-commands.json
+just compile-commands
 ```
 
 You can easily regenerate the file and build at the same time with:
 ```shell
-make build-dev
+just build-dev
 ```
 
 **Warning:** the clangd configuration file is generated on-the-go by vscode with clangd extension.
@@ -40,7 +40,7 @@ make build-dev
 If you are not using vscode, make sure to run:
 
 ```shell
-make .clangd
+just gen-clangd
 ```
 
 ## Clang tidy
@@ -48,5 +48,5 @@ make .clangd
 You can lint the code by running:
 
 ```shell
-make lint
+just lint
 ```
